@@ -20,10 +20,9 @@
         </div>
     </div>
 </template>
-<script setup lang="ts">
+<script setup>
 import { ref, reactive } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
-
+import { useRouter } from 'vue-router'
 
 //表单绑定的响应式对象
 const LoginForm = reactive({
@@ -44,28 +43,21 @@ const Loginrules = reactive({
         { min: 6, max: 20, message: '长度在 6 到 20 个字符之间', trigger: 'blur' }
     ]
 })
-// 登录逻辑
-const login = () => {
-    console.log(LoginForm)
-    localStorage.setItem('token', '123456')
-    // 这里可以添加路由跳转逻辑
-}
-
+const router = useRouter()
 // 提交表单
-const submitForm = () => {
-    //1.校验表单
-    LoginFormRef.value.validate((valid: boolean) => {
-        console.log('valid', valid)
+const submitForm = () => { 
+    //1.表单验证
+    LoginFormRef.value.validate((valid) => {
+        console.log('验证结果', valid);
         if (valid) {
-            login()
-        } else {
-            console.log('表单验证失败')
-            return false
+            console.log('验证通过，提交表单');
+            localStorage.setItem('token', 'demo-token')
+            router.push({ path: '/home' })
         }
-    })
-    //2.获取内容提交后台
+    });
+    //2.验证通过后，发送登录请求
 
-    //3.设置token
+    //3.登录成功后，存储token，跳转首页
 }
 
 // 粒子背景配置

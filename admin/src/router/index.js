@@ -39,7 +39,7 @@ router.beforeEach((to, from, next) => {
         // token 在登录成功后 设置到本地存储中
         const token = localStorage.getItem('token')
         if (token) {
-            if (!globalStore.isGettingRouter) {
+            if (!globalStore.isGlobalRouter) {
                 ConfigRouter(globalStore)
                 next({
                     path: to.fullPath,
@@ -59,8 +59,8 @@ const ConfigRouter = (globalStore) => {
     RoutesConfig.forEach(item => {
         router.addRoute('Mainbox', item)
     })
-    // 添加完路由后，设置 isGettingRouter 为 true
-    globalStore.setGettingRouter(true);
+    // 添加完路由后，设置 isGlobalRouter 为 true
+    globalStore.setGlobalRouter(true);
 }
 
 
