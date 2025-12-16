@@ -23,6 +23,7 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
+import axios from 'axios'
 
 //表单绑定的响应式对象
 const LoginForm = reactive({
@@ -52,6 +53,9 @@ const submitForm = () => {
         if (valid) {
             console.log('验证通过，提交表单');
             localStorage.setItem('token', 'demo-token')
+            axios.get("/users").then(res => {
+             console.log(res.data)
+            });
             router.push({ path: '/home' })
         }
     });
