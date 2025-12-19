@@ -23,7 +23,10 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
+import axios from '../util/axios.config.js'
+import { ElMessage } from 'element-plus'
+import useUserInfoStore from '../store/userInfo.js'
+
 
 //表单绑定的响应式对象
 const LoginForm = reactive({
@@ -45,18 +48,35 @@ const Loginrules = reactive({
     ]
 })
 const router = useRouter()
+const userInfoStore = useUserInfoStore()
 // 提交表单
-const submitForm = () => { 
+const submitForm = () => {
     //1.表单验证
     LoginFormRef.value.validate((valid) => {
-        console.log('验证结果', valid);
         if (valid) {
-            console.log('验证通过，提交表单');
-            localStorage.setItem('token', 'demo-token')
-            axios.get("/users").then(res => {
-             console.log(res.data)
+            axios.post("/adminApi/user/login", LoginForm).then(res => {
+                console.log('登录响应:', res.data);
+                if (res.data.code === 200) {
+                    // 登录成功
+                    console.log('登录成功！');
+                    // 存储token到localStorage
+                    // localStorage.setItem('token', res.data.data.token);
+                    console.log('登录响应数据:', res.data.data);
+                    userInfoStore.setUserInfo(res.data.data); // 存储用户信息到 Pinia Store
+                    console.log('用户信息:', userInfoStore.$state);
+                    // 跳转到首页
+                    router.push('/');
+                } else {
+                    // 登录失败
+                    ElMessage.error('Username or password is incorrect!!!');
+                    console.error('登录失败:', res.data.message);
+                }
+            }).catch(error => {
+                console.error('登录请求失败:', error);
+                if (error.response && error.response.data) {
+                    console.error('错误信息:', error.response.data.message);
+                }
             });
-            router.push({ path: '/home' })
         }
     });
     //2.验证通过后，发送登录请求

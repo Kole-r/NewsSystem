@@ -1,0 +1,11 @@
+const express = require('express');
+const UserRouter = express.Router();
+const UserController = require('../../controllers/admin/UserController');
+// 处理文件上传
+const multer = require('multer')
+const upload = multer({ dest: 'public/avataruploads/' })
+
+// 用户路由
+UserRouter.post("/user/login", UserController.login);// 登录接口
+UserRouter.post("/user/upload", upload.single('file'), UserController.upload);// 上传头像接口
+module.exports = UserRouter;

@@ -7,6 +7,7 @@ import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import Particles from "@tsparticles/vue3"
 import { loadFull } from "tsparticles";
+import './util/axios.config.js';
 
 const app = createApp(App);
 app.use(Particles, {

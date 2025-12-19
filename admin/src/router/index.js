@@ -36,7 +36,6 @@ router.beforeEach((to, from, next) => {
     }
     else {
         // 如果用户没有登录 则跳转到登录页面
-        // token 在登录成功后 设置到本地存储中
         const token = localStorage.getItem('token')
         if (token) {
             if (!globalStore.isGlobalRouter) {

@@ -13,6 +13,4 @@
 <script setup>
 import TopHeader from '../components/mainbox/TopHeader.vue';
 import SideMenu from '../components/mainbox/SideMenu.vue';
-
-
 </script>

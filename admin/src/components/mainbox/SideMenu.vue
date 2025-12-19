@@ -68,7 +68,8 @@ const route = useRoute();
 <style scoped lang="scss">
 // 侧边栏容器
 .el-aside {
-    height: 100vh;
+    min-height: 100vh;
+    height: auto;
     box-shadow: 2px 0 6px rgba(0, 0, 0, 0.05);
 
     .el-menu {

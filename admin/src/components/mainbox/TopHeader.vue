@@ -7,7 +7,7 @@
             <span style="margin-left: 10px;">企业门户管理系统</span>
         </div>
         <div class="right">
-            <span>欢迎 xxxx 回来！！！</span>
+            <span>欢迎 {{userInfo.$state.username}} 回来！！！</span>
             <el-dropdown>
                 <span class="el-dropdown-link">
                     <el-icon >
@@ -29,9 +29,11 @@ import { useCollapseStore } from '../../store/collapse.js';
 import { useRouter } from 'vue-router';
 import { Menu as MenuIcon } from '@element-plus/icons-vue';
 import { UserFilled } from '@element-plus/icons-vue';
-
+import useUserInfoStore from '../../store/userInfo.js';
+import { lo } from 'element-plus/es/locales.mjs';
 const collapseStore = useCollapseStore(); // 获取 Pinia Store
 const router = useRouter();
+const userInfo = useUserInfoStore();
 
 // 切换侧边栏折叠状态
 const handleCollapsed = () => {
@@ -42,6 +44,7 @@ const handleCenter=() => {
 }
 const handleLogout = () => { 
     localStorage.removeItem("token");
+    userInfo.clearUserInfo();
     router.push({ path: '/login' });
 }
 </script>

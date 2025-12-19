@@ -10,4 +10,4 @@ export const useCollapseStore = defineStore('collapse', {
         }
     },
     persist: true,
-});
+});//记录侧边栏折叠状态
