@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from '../util/axios.config.js';
 
 function upload(path, userForm) {
     const formData = new FormData();//因为涉及文件上传，所以用formdata
