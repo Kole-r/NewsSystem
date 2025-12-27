@@ -15,6 +15,10 @@ export default defineConfig({
       '/adminApi': {
         target: 'http://localhost:3000', // 目标服务器地址
         changeOrigin: true, // 是否改变请求源
+      },
+      '/avataruploads': {
+        target: 'http://localhost:3000', // 目标服务器地址
+        changeOrigin: true, // 是否改变请求源
       }
     }
   }

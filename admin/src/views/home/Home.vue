@@ -37,7 +37,7 @@ import useUserInfoStore from '../../store/userInfo.js';
 import { computed } from 'vue';
 const{avatar}=useUserInfoStore().$state;
 const userInfo = useUserInfoStore();
-const avatarUrl = computed(() => avatar ? 'http://localhost:3000'+avatar : 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png');
+const avatarUrl = computed(() => userInfo.$state.avatar ? userInfo.$state.avatar : 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png');
 const welcomeText = computed(() => {
     const hours = new Date().getHours();
     if (hours < 12) {

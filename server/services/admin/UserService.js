@@ -1,4 +1,3 @@
-const { upload } = require('../../controllers/admin/UserController');
 const UserModel = require('../../models/UserModel');
 
 const UserService = {

@@ -50,13 +50,16 @@ const UserController = {
     upload: async (req, res) => {
         const { username, introduction, gender } = req.body;
         const avatar = req.file ? `/avataruploads/${req.file.filename}` : null;
-        console.log('头像上传路径:', avatar);
         //调用server模块更新数据
         const token = req.headers['authorization']?.split(' ')[1];
         const payload = JWT.verify(token);
-        
+        //更新用户信息
         try {
-            await UserService.update(payload.id, { username, introduction, gender: Number(gender), avatar });
+            const updateData = { username, introduction, gender: Number(gender) };
+            if (avatar) {
+                updateData.avatar = avatar; // 只有当 avatar 不为空时才添加到更新数据中
+            }
+            await UserService.update(payload.id, updateData);
             res.status(200).json({
                 code: 200,
                 message: '头像上传成功',

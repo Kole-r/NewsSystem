@@ -44,6 +44,8 @@ const update = async (id, userData) => {
     const filteredData = Object.entries(userData)
       .filter(([_, value]) => value !== undefined)//用于过滤二维数组，返回满足条件的元素的新数组。
       .reduce((obj, [key, value]) => ({ ...obj, [key]: value }), {});//用于将二维数组转换为对象
+    
+    console.log(filteredData);
     if (Object.keys(filteredData).length === 0) {
       throw new Error('没有可更新的字段');
     }
