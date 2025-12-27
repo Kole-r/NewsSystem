@@ -24,4 +24,4 @@ dist-ssr
 *.sw?
 
 # Ignore avataruploads folder
-public/avataruploads/
+/server/public/avataruploads/
