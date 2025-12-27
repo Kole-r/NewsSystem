@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-page-header content="个人中心" icon="" title="企业门户网站后台管理系统" />
+        <el-page-header content="个人中心" icon="" title="企业门户网站后台管理系统" class="page-header" />
         <el-row :gutter="20" style="margin-top: 20px;">
             <el-col :span="6" style="margin-top: 20px;">
                 <el-card class="box-card">
@@ -11,7 +11,7 @@
                     </div>
                 </el-card>
             </el-col>
-            <el-col :span="16" style="margin-top: 20px;">
+            <el-col :span="18" style="margin-top: 20px;">
                 <el-card>
                     <template #header>
                         <div class="card-header">
@@ -127,4 +127,102 @@ const submitForm = () => {
 };
 </script>
 
+<style lang="scss" scoped>
+// 基础容器
+.page-header {
+    background-color: #ffffff;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
+    font-size: 16px;
+    font-weight: 600;
+    color: #303133;
+}
 
+// 左侧头像卡片
+.box-card {
+    text-align: center;
+    border-radius: 8px;
+    transition: all 0.3s;
+
+    &:hover {
+        box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.1);
+    }
+
+    .card-body {
+        padding: 20px 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        .el-avatar {
+            border: 4px solid #f0f2f5;
+            margin-bottom: 15px;
+        }
+
+        p {
+            font-size: 16px;
+            color: #303133;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+
+        h5 {
+            font-size: 13px;
+            color: #909399;
+            font-weight: normal;
+            background: #f4f4f5;
+            padding: 4px 12px;
+            border-radius: 12px;
+            margin-top: 5px;
+        }
+    }
+}
+
+// 右侧信息卡片
+:deep(.el-card) {
+    border-radius: 8px;
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: center; // 标题居中，与你原图一致
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+        padding: 10px 0;
+    }
+}
+
+// 表单美化
+.el-form {
+    padding: 10px 20px;
+
+    :deep(.el-form-item__label) {
+        font-weight: 600;
+        color: #606266;
+    }
+
+    // 调整保存按钮区域
+    .el-form-item:last-child {
+        margin-top: 30px;
+
+        .el-button {
+            width: 120px;
+            padding: 12px 20px;
+            font-size: 14px;
+        }
+    }
+}
+
+// 输入框聚焦时的平滑过渡
+:deep(.el-input__inner),
+:deep(.el-textarea__inner) {
+    transition: all 0.2s;
+
+    &:focus {
+        background-color: #fcfcfc;
+    }
+}
+</style>

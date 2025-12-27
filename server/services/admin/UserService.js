@@ -7,6 +7,9 @@ const UserService = {
   },
   update: async (id, userData) => {
     return UserModel.update(id, userData);
+  },
+  addUser: async (userData) => {
+    return UserModel.create(userData);
   }
 };
 

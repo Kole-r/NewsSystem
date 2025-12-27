@@ -76,6 +76,40 @@ const UserController = {
                 message: '服务器内部错误'
             });
         }
+    },
+    // 添加用户
+    addUser: async (req, res) => {
+        try {
+            const { username, password, role, gender, introduction } = req.body;
+            const avatar = req.file ? `/avataruploads/${req.file.filename}` : null;
+
+            // 参数验证
+            if (!username || !password || !role) {
+                return res.status(400).json({
+                    code: 400,
+                    message: '用户名、密码和角色不能为空'
+                });
+            }
+
+            // 调用Service层添加用户
+            await UserService.addUser({
+                username,
+                password,
+                role: Number(role),
+                gender: Number(gender),
+                introduction,
+                avatar
+            });
+            res.status(200).json({
+                code: 200,
+                message: '用户添加成功'
+            });
+        } catch (error) {
+            res.status(500).json({
+                code: 500,
+                message: '服务器内部错误'
+            });
+        }
     }
 };
 

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-page-header content="首页" icon="" title="企业门户网站后台管理系统" />
+        <el-page-header content="首页" icon="" title="企业门户网站后台管理系统" class="page-header" />
         <el-card class="box-card">
             <el-row>
                 <!-- 头像 -->
@@ -10,7 +10,7 @@
                 <!-- 欢迎语 -->
                 <el-col :span="20">
                     <h3 style="line-height: 100px">
-                        欢迎 {{ userInfo.$state.username}} 回来, {{ welcomeText }}
+                        欢迎 {{ userInfo.$state.username }} 回来, {{ welcomeText }}
                     </h3>
                 </el-col>
             </el-row>
@@ -35,7 +35,7 @@
 <script setup>
 import useUserInfoStore from '../../store/userInfo.js';
 import { computed } from 'vue';
-const{avatar}=useUserInfoStore().$state;
+const { avatar } = useUserInfoStore().$state;
 const userInfo = useUserInfoStore();
 const avatarUrl = computed(() => userInfo.$state.avatar ? userInfo.$state.avatar : 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png');
 const welcomeText = computed(() => {
@@ -50,9 +50,20 @@ const welcomeText = computed(() => {
 });
 </script>
 <style scoped lang="scss">
+.page-header {
+    background-color: #ffffff;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
+    font-size: 16px;
+    font-weight: 600;
+    color: #303133;
+}
+
 .box-card {
     margin-top: 50px;
 }
+
 .el-carousel__item h3 {
     color: #475669;
     font-size: 14px;
