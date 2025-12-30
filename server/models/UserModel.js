@@ -69,10 +69,10 @@ const update = async (id, userData) => {
 
 
 // 删除用户
-const remove = async (id) => {
-  const [result] = await db.query('DELETE FROM users WHERE id = ?', [id]);
-  return result.affectedRows;
-};
+  const deleteUser = async (id) => {
+    const [result] = await db.query('DELETE FROM users WHERE id = ?', [id]);
+    return result.affectedRows;
+  };
 
 module.exports = {
   findByUsername,
@@ -81,5 +81,5 @@ module.exports = {
   findAll,
   create,
   update,
-  remove
+  deleteUser
 };

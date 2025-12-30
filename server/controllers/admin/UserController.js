@@ -35,9 +35,9 @@ const UserController = {
                 data: {
                     username: userInfo.username,
                     role: userInfo.role,
-                    gender: userInfo.gender?userInfo.gender:null,
-                    introduction: userInfo.introduction?userInfo.introduction:null,
-                    avatar: userInfo.avatar?userInfo.avatar:null
+                    gender: userInfo.gender ? userInfo.gender : null,
+                    introduction: userInfo.introduction ? userInfo.introduction : null,
+                    avatar: userInfo.avatar ? userInfo.avatar : null
                 }
             });
         } catch (error) {
@@ -110,7 +110,106 @@ const UserController = {
                 message: '服务器内部错误'
             });
         }
+    },
+    // 获取用户列表/单个数据
+    getUser: async (req, res) => {
+        try {
+            const userId = req.params.id; // 获取路径参数中的 id
+            const result = await UserService.getUser(userId);
+
+            // 处理返回结果：如果是单个用户，转换为数组；如果是列表，直接使用
+            const users = Array.isArray(result) ? result : (result ? [result] : []);
+
+            res.status(200).json({
+                code: 200,
+                message: '用户列表获取成功',
+                data: users.map(user => ({
+                    id: user.id,
+                    username: user.username,
+                    role: user.role,
+                    avatar: user.avatar,
+                    introduction: user.introduction,
+                }))
+            });
+        } catch (error) {
+            console.error('获取用户列表失败:', error); // 添加错误日志
+            res.status(500).json({
+                code: 500,
+                message: '服务器内部错误',
+                error: error.message // 开发环境可以返回错误详情
+            });
+        }
+    },
+    // 删除用户
+    deleteUser: async (req, res) => {
+        try {
+            const userId = req.params.id;
+            if (!userId) {
+                return res.status(400).json({
+                    code: 400,
+                    message: '用户ID不能为空'
+                });
+            }
+            await UserService.deleteUser(userId);
+            res.status(200).json({
+                code: 200,
+                message: '用户删除成功'
+            });
+        } catch (error) {
+            res.status(500).json({
+                code: 500,
+                message: '服务器内部错误'
+            });
+        }
+    },
+    //编辑用户
+    editUser: async (req, res) => {
+        try {
+            console.log('=== editUser 开始 ===');
+            console.log('req.params:', req.params);
+            console.log('req.body:', req.body);
+            console.log('req.file:', req.file);
+            
+            const userId = req.params.id;
+            const { username, password, role, gender, introduction } = req.body;
+            const avatar = req.file ? `/avataruploads/${req.file.filename}` : undefined;
+            
+            // 参数验证
+            if (!userId) {
+                return res.status(400).json({
+                    code: 400,
+                    message: '用户ID不能为空'
+                });
+            }
+            
+            // 构建更新数据（只更新提供的字段，使用 in 检查字段是否存在）
+            const updateData = {};
+            if ('username' in req.body && username) updateData.username = username;
+            if ('password' in req.body && password) updateData.password = password; // 密码可选，空则不更新
+            if ('role' in req.body && role !== undefined) updateData.role = Number(role);
+            if ('gender' in req.body && gender !== undefined) updateData.gender = Number(gender);
+            if ('introduction' in req.body) updateData.introduction = introduction || ''; // 允许清空
+            if (avatar) updateData.avatar = avatar; // 只有上传新头像才更新
+            
+            console.log('updateData:', updateData);
+            
+            // 调用Service层更新用户
+            await UserService.update(userId, updateData);
+
+            res.status(200).json({
+                code: 200,
+                message: '用户更新成功'
+            });
+        } catch (error) {
+            console.error('编辑用户失败:');
+            res.status(500).json({
+                code: 500,
+                message: '服务器内部错误',
+                error: error.message
+            });
+        }
     }
+
 };
 
 module.exports = UserController;

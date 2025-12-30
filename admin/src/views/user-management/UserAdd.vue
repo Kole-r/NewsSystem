@@ -2,7 +2,6 @@
     <div>
         <el-page-header content="添加用户" icon="" title="用户管理" class="page-header" />
         <el-row :gutter="20" style="margin-top: 20px;">
-
             <el-col style="margin-top: 20px;">
                 <el-card class="add-user-card">
                     <el-form ref="userFormRef" :model="userForm" :rules="userFormRules" label-width="auto">
@@ -67,6 +66,7 @@ const submitForm = () => {
             console.log('表单验证通过:', userForm);
             // 在这里处理表单提交逻辑，例如发送请求到后端
             await upload('/adminApi/user/add', userForm);
+            // 提交成功后跳转到用户列表页
             router.push(`/user-management/UserList`);
         } else {
             console.log('表单验证失败');

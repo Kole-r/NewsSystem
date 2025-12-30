@@ -10,6 +10,12 @@ const UserService = {
   },
   addUser: async (userData) => {
     return UserModel.create(userData);
+  },
+  getUser: async (id) => {
+    return id ? UserModel.findById(id) : UserModel.findAll();
+  },
+  deleteUser: async (id) => {
+    return UserModel.deleteUser(id);
   }
 };
 
