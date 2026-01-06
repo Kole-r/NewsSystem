@@ -19,10 +19,12 @@ const routes = [
     {
         path: '/user-management/UserList',
         component: UserList,
+        requiresAdmin: true,
     },
     {
         path: '/user-management/UserAdd',
         component: UserAdd,
+        requiresAdmin: true,
     },
     {
         path: '/product-management/ProductList',

@@ -7,7 +7,7 @@
                     <div class="card-body">
                         <el-avatar :size="100" :src="avatarUrl" />
                         <p>用户名: {{ username }}</p>
-                        <h5>{{ role === 1 ? "管理员" : "编辑" }}</h5>
+                        <h5>{{ role === 1 ? "管理员" : "编辑者" }}</h5>
                     </div>
                 </el-card>
             </el-col>
@@ -69,7 +69,7 @@ const avatarUrl = computed(() => userInfo.$state.avatar ? userInfo.$state.avatar
 const userFormRules = reactive({
     username: [{ required: true, message: "请输入名字", trigger: "blur" }],
     gender: [{ required: true, message: "请选择性别", trigger: "blur" }],
-    introduction: [{ required: true, message: "请输入介绍", trigger: "blur" }],
+    introduction: [{ required: false, message: "请输入介绍", trigger: "blur" }],
     avatar: [{ required: true, message: "请上传头像", trigger: "blur" }],
 });
 

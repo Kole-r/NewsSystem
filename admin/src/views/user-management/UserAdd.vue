@@ -44,6 +44,7 @@ import { reactive, ref } from 'vue';
 import Upload from '@/components/upload/Upload.vue';
 import upload from '@/util/upload.js';
 import { useRouter } from 'vue-router';
+import { ElMessage } from 'element-plus'
 const router = useRouter();
 const userFormRef = ref();
 const userForm = reactive({
@@ -60,14 +61,26 @@ const handChange = (file) => {
     userForm.avatar = URL.createObjectURL(file);
     userForm.file = file;
 };
+const open4 = () => {
+    ElMessage.error('用户名或密码格式不对！请重新输入。');
+};
 const submitForm = () => {
     userFormRef.value.validate(async (valid) => {
         if (valid) {
             console.log('表单验证通过:', userForm);
-            // 在这里处理表单提交逻辑，例如发送请求到后端
-            await upload('/adminApi/user/add', userForm);
-            // 提交成功后跳转到用户列表页
-            router.push(`/user-management/UserList`);
+            try {
+                // 在这里处理表单提交逻辑，例如发送请求到后端
+                const res = await upload('/adminApi/user/add', userForm);
+                router.push(`/user-management/UserList`);
+
+            } catch (error) {
+                if (error.response && error.response.status === 400) {
+                    open4();
+                    console.error('提交失败:', error.response.data.message);
+                } else {
+                    console.error('提交过程中发生错误:', error);
+                }
+            }
         } else {
             console.log('表单验证失败');
             return false;
@@ -76,11 +89,17 @@ const submitForm = () => {
 };
 //规则
 const userFormRules = reactive({
-    username: [{ required: true, message: "请输入用户名", trigger: "blur" }],
-    password: [{ required: true, message: "请输入密码", trigger: "blur" }],
+    username: [
+        { required: true, message: "请输入用户名", trigger: "blur" },
+        { min: 3, max: 20, message: "用户名长度必须在3到20个字符之间", trigger: "blur" }
+    ],
+    password: [
+        { required: true, message: "请输入密码", trigger: "blur" },
+        { min: 6, max: 20, message: "密码长度必须在6到20个字符之间", trigger: "blur" }
+    ],
     role: [{ required: true, message: "请选择角色", trigger: "blur" }],
     gender: [{ required: true, message: "请选择性别", trigger: "blur" }],
-    introduction: [{ required: true, message: "请输入介绍", trigger: "blur" }],
+    introduction: [{ required: false, message: "请输入介绍", trigger: "blur" }],
     avatar: [{ required: true, message: "请上传头像", trigger: "blur" }],
 });
 

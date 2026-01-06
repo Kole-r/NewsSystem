@@ -84,9 +84,16 @@ const userForm = reactive({
 });
 // 表单验证规则
 const userFormRules = reactive({
-    username: [{ required: true, message: "请输入用户名", trigger: "blur" }],
+    username: [
+        { required: true, message: "请输入用户名", trigger: "blur" },
+        { min: 3, max: 20, message: "用户名长度必须在3到20个字符之间", trigger: "blur" }
+    ],
+    password: [
+        { required: false, message: "请输入密码", trigger: "blur" },
+        { min: 6, max: 20, message: "密码长度必须在6到20个字符之间", trigger: "blur" }
+    ],
     role: [{ required: true, message: "请选择角色", trigger: "blur" }],
-    introduction: [{ required: true, message: "请输入介绍", trigger: "blur" }],
+    introduction: [{ required: false, message: "请输入介绍", trigger: "blur" }],
     avatar: [{ required: true, message: "请上传头像", trigger: "blur" }],
 });
 const handleChange = (file) => {

@@ -17,7 +17,7 @@
                 <span>个人中心</span>
             </el-menu-item>
 
-            <el-sub-menu index="/user-management">
+            <el-sub-menu index="/user-management" v-admin>
                 <template #title>
                     <el-icon>
                         <Avatar />
@@ -58,10 +58,20 @@
 import { HomeFilled, UserFilled, Avatar, Promotion, Management, Reading } from '@element-plus/icons-vue'
 import { useCollapseStore } from '../../store/collapse.js'// 导入 Pinia Store
 import { useRoute } from 'vue-router';
-import { fa } from 'element-plus/es/locales.mjs';
+import { useUserInfoStore } from '../../store/userInfo.js';
+
             
 const collapseStore = useCollapseStore(); // 获取 Pinia Store
 const route = useRoute();
+const userInfo = useUserInfoStore();
+console.log('当前用户角色:', userInfo.$state.role);
+const vAdmin={
+    mounted(el) {
+        if (userInfo.$state.role !== 1) {
+            el.parentNode && el.parentNode.removeChild(el);
+        }
+    }
+};
 
 </script>
 

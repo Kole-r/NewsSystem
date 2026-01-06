@@ -84,10 +84,22 @@ const UserController = {
             const avatar = req.file ? `/avataruploads/${req.file.filename}` : null;
 
             // 参数验证
-            if (!username || !password || !role) {
+            if (!username || username.length < 3 || username.length > 20) {
                 return res.status(400).json({
                     code: 400,
-                    message: '用户名、密码和角色不能为空'
+                    message: '用户名长度必须在3到20个字符之间'
+                });
+            }
+            if (!password || password.length < 6 || password.length > 20) {
+                return res.status(400).json({
+                    code: 400,
+                    message: '密码长度必须在6到20个字符之间'
+                });
+            }
+            if (!role) {
+                return res.status(400).json({
+                    code: 400,
+                    message: '角色不能为空'
                 });
             }
 
@@ -175,6 +187,18 @@ const UserController = {
             const avatar = req.file ? `/avataruploads/${req.file.filename}` : undefined;
             
             // 参数验证
+            if (!username || username.length < 3 || username.length > 20) {
+                return res.status(400).json({
+                    code: 400,
+                    message: '用户名长度必须在3到20个字符之间'
+                });
+            }
+            if (password && (password.length < 6 || password.length > 20)) {
+                return res.status(400).json({
+                    code: 400,
+                    message: '密码长度必须在6到20个字符之间'
+                });
+            }
             if (!userId) {
                 return res.status(400).json({
                     code: 400,

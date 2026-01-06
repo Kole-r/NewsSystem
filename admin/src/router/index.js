@@ -4,6 +4,8 @@ import Mainbox from '../views/MainBox.vue';
 import RoutesConfig from './config';
 import { useGlobalStore } from '../store/global'; // 引入 Pinia Store
 import NotFound from '../views/notFound/NotFound.vue';
+import { useUserInfoStore } from '../store/userInfo.js';
+import { it } from 'element-plus/es/locales.mjs';
 
 const routes = [
     {
@@ -14,15 +16,17 @@ const routes = [
     {
         path: "/Mainbox",
         name: "Mainbox",
-        component: Mainbox
-    },
-    {
-        path: "/:pathMatch(.*)*",// 匹配所有路径
-        name: "NotFound",
-        component: NotFound
+        component: Mainbox,
+        children: [
+            {
+                path: "/:pathMatch(.*)*",// 匹配所有路径
+                name: "NotFound",
+                component: NotFound
+            }
+        ]
+        
     }
 ];
-
 const router = createRouter({
     history: createWebHistory(),
     routes,
@@ -56,11 +60,19 @@ router.beforeEach((to, from, next) => {
 const ConfigRouter = (globalStore) => {
     // 动态添加路由
     RoutesConfig.forEach(item => {
-        router.addRoute('Mainbox', item)
+        checkPermission(item)&&router.addRoute('Mainbox', item)
     })
     // 添加完路由后，设置 isGlobalRouter 为 true
     globalStore.setGlobalRouter(true);
 }
-
+const checkPermission = (item) => {
+    // 这里可以添加权限判断逻辑
+    if (item.requiresAdmin) {
+        const userInfo = useUserInfoStore();
+        const role = userInfo.$state.role
+        return role === 1;
+    }
+    return true
+}
 
 export default router;
