@@ -5,11 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "start": "vite",
     "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
     "@tsparticles/vue3": "^3.0.1",
+    "@wangeditor/editor-for-vue": "^5.1.12",
     "axios": "^1.13.2",
     "element-plus": "^2.12.0",
     "pinia": "^3.0.4",

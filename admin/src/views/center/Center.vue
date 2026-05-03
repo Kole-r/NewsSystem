@@ -1,58 +1,99 @@
 <template>
-    <div>
-        <el-page-header content="个人中心" icon="" title="企业门户网站后台管理系统" class="page-header" />
-        <el-row :gutter="20" style="margin-top: 20px;">
-            <el-col :span="6" style="margin-top: 20px;">
-                <el-card class="box-card">
-                    <div class="card-body">
-                        <el-avatar :size="100" :src="avatarUrl" />
-                        <p>用户名: {{ username }}</p>
-                        <h5>{{ role === 1 ? "管理员" : "编辑者" }}</h5>
-                    </div>
-                </el-card>
-            </el-col>
-            <el-col :span="18" style="margin-top: 20px;">
-                <el-card>
-                    <template #header>
-                        <div class="card-header">
-                            <span style="margin-left: 1px;">个人信息</span>
-                        </div>
-                    </template>
-                    <el-form ref="userFormRef" :model="userForm" :rules="userFormRules" label-width="auto">
-                        <el-form-item label="用户名" prop="username">
-                            <el-input v-model="userForm.username" />
-                        </el-form-item>
-                        <el-form-item label="性别" prop="gender">
-                            <el-select v-model="userForm.gender" class="m-2" placeholder="Select" style="width: 100%">
-                                <el-option v-for="item in options" :key="item.value" :label="item.label"
-                                    :value="item.value" />
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item label="个人简介" prop="introduction">
-                            <el-input v-model="userForm.introduction" type="textarea" />
-                        </el-form-item>
-                        <el-form-item label="头像" prop="avatar">
-                            <Upload :avatar="userForm.avatar" @koleChange="handChange" />
-                        </el-form-item>
-                        <el-form-item style="margin-left: 80px;">
-                            <el-button class="!ml-0" :plain="true" type="primary" @click="submitForm">保存</el-button>
-                        </el-form-item>
+    <div class="center-page">
+        <!-- Hero -->
+        <div class="page-hero">
+            <div class="hero-left">
+                <span class="hero-label">ACCOUNT</span>
+                <h1 class="hero-title">个人中心</h1>
+            </div>
+        </div>
 
-                    </el-form>
-                </el-card>
-            </el-col>
-        </el-row>
+        <!-- Content Grid -->
+        <div class="content-grid">
+            <!-- Profile Card -->
+            <div class="profile-card">
+                <div class="avatar-section">
+                    <div class="avatar-ring">
+                        <img :src="avatarUrl" alt="avatar" class="avatar-img" />
+                    </div>
+                    <span class="profile-name">{{ username }}</span>
+                    <span class="profile-role-tag">{{ role === 1 ? '管理员' : '编辑者' }}</span>
+                </div>
+                <div class="profile-stats">
+                    <div class="pstat-row">
+                        <span class="pstat-label">USERNAME</span>
+                        <span class="pstat-value">{{ username }}</span>
+                    </div>
+                    <div class="pstat-row">
+                        <span class="pstat-label">ROLE</span>
+                        <span class="pstat-value">{{ role === 1 ? '管理员' : '编辑者' }}</span>
+                    </div>
+                    <div class="pstat-row">
+                        <span class="pstat-label">GENDER</span>
+                        <span class="pstat-value">{{ genderLabel }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Form -->
+            <div class="form-card">
+                <div class="form-header">
+                    <span class="form-tag">EDIT PROFILE</span>
+                </div>
+                <div class="form-body">
+                    <div class="form-group">
+                        <label class="form-label">用户名</label>
+                        <input
+                            v-model="userForm.username"
+                            type="text"
+                            class="form-input"
+                            placeholder="请输入用户名"
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">性别</label>
+                        <div class="select-wrap">
+                            <select v-model="userForm.gender" class="form-select">
+                                <option v-for="item in genderOptions" :key="item.value" :value="item.value">
+                                    {{ item.label }}
+                                </option>
+                            </select>
+                            <span class="select-arrow">&#9662;</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">个人简介</label>
+                        <textarea
+                            v-model="userForm.introduction"
+                            class="form-textarea"
+                            rows="4"
+                            placeholder="请输入个人简介"
+                        ></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">头像</label>
+                        <Upload :avatar="userForm.avatar" @koleChange="handChange" />
+                    </div>
+                    <div class="form-actions">
+                        <span v-if="statusMsg" class="status-msg">{{ statusMsg }}</span>
+                        <button class="btn-save" @click="submitForm">保存更改</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
+
 <script setup>
 import useUserInfoStore from '../../store/userInfo.js';
 import { computed, reactive, ref } from 'vue';
-import { ElMessage } from 'element-plus'
 import upload from '@/util/upload.js';
 import Upload from '@/components/upload/Upload.vue';
+
 const userInfo = useUserInfoStore();
 const { username, gender, introduction, role, avatar } = userInfo.$state;
 const userFormRef = ref();
+const statusMsg = ref('');
 const userForm = reactive({
     username,
     gender,
@@ -60,169 +101,331 @@ const userForm = reactive({
     avatar,
     file: null
 });
-console.log('初始头像路径:', userForm.avatar);
-// 推荐使用状态管理库（如 Pinia）的状态来判断响应式数据，确保全局共享和实时更新
-// 计算属性动态生成头像 URL
+
 const avatarUrl = computed(() => userInfo.$state.avatar ? userInfo.$state.avatar : 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png');
 
-// 表单数据规则
-const userFormRules = reactive({
-    username: [{ required: true, message: "请输入名字", trigger: "blur" }],
-    gender: [{ required: true, message: "请选择性别", trigger: "blur" }],
-    introduction: [{ required: false, message: "请输入介绍", trigger: "blur" }],
-    avatar: [{ required: true, message: "请上传头像", trigger: "blur" }],
+const genderLabel = computed(() => {
+    const map = { 0: '未知', 1: '男', 2: '女' };
+    return map[gender] || '未知';
 });
 
-//性别选择
-const options = [
-    {
-        label: "未知",
-        value: 0,
-    },
-    {
-        label: "男",
-        value: 1,
-    },
-    {
-        label: "女",
-        value: 2,
-    },
+const genderOptions = [
+    { label: '未知', value: 0 },
+    { label: '男', value: 1 },
+    { label: '女', value: 2 },
 ];
+
 const handChange = (file) => {
-    console.log('上传的文件:', file);
     userForm.avatar = URL.createObjectURL(file);
     userForm.file = file;
 };
-const submitForm = () => {
-    userFormRef.value.validate(async (valid) => {
-        if (valid) {
-            const res = await upload("/adminApi/user/upload", userForm)
-            console.log('后端返回的 data 数据:', res.data);
-            if (res.code === 200) {
-                // ✅ 使用后端返回的服务器路径
-                //为什么要有后备？因为有可能用户没有更换头像，后端就不会返回新的头像路径
-                const serverAvatar = res.data.avatar || userForm.avatar;
 
-                // 更新用户信息到 Pinia Store
-                userInfo.setUserInfo({
-                    ...userInfo.$state,
-                    username: userForm.username,
-                    introduction: userForm.introduction,
-                    gender: Number(userForm.gender),
-                    avatar: serverAvatar  // 使用服务器返回的路径
-                });
+const showStatus = (msg) => {
+    statusMsg.value = msg;
+    setTimeout(() => { statusMsg.value = ''; }, 3000);
+};
 
-                // 同步更新表单中的头像路径
-                userForm.avatar = serverAvatar;
-
-                console.log('保存后的头像路径:', userInfo.$state.avatar);
-            }
-
+const submitForm = async () => {
+    if (!userForm.username) {
+        showStatus('[ERROR] 请输入用户名');
+        return;
+    }
+    try {
+        const res = await upload("/adminApi/user/upload", userForm);
+        if (res.code === 200) {
+            const serverAvatar = res.data.avatar || userForm.avatar;
+            userInfo.setUserInfo({
+                ...userInfo.$state,
+                username: userForm.username,
+                introduction: userForm.introduction,
+                gender: Number(userForm.gender),
+                avatar: serverAvatar
+            });
+            userForm.avatar = serverAvatar;
+            showStatus('[SAVED]');
         }
-    });
-    ElMessage({
-        message: '更新成功！！！',
-        type: 'success',
-    })
+    } catch (e) {
+        showStatus('[ERROR] 保存失败');
+    }
 };
 </script>
 
 <style lang="scss" scoped>
-// 基础容器
-.page-header {
-    background-color: #ffffff;
-    padding: 15px 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
-    font-size: 16px;
-    font-weight: 600;
-    color: #303133;
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap');
+
+/* ── Tokens ── */
+$black: #000000;
+$surface: #0A0A0A;
+$surface-1: #111111;
+$surface-2: #161616;
+$border: #1E1E1E;
+$border-hi: #2A2A2A;
+$g1: #333333;
+$g2: #555555;
+$g3: #888888;
+$g4: #AAAAAA;
+$g5: #CCCCCC;
+$white: #F0F0F0;
+$pure: #FFFFFF;
+$accent: #D71921;
+$green: #3DDC84;
+
+.center-page {
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    color: $g5;
+    background: $black;
+    min-height: 100vh;
+    padding: 32px 40px 64px;
 }
 
-// 左侧头像卡片
-.box-card {
-    text-align: center;
+/* ── Hero ── */
+.page-hero {
+    margin-bottom: 40px;
+}
+
+.hero-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: $g3;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.hero-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: $pure;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+/* ── Content Grid ── */
+.content-grid {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+/* ── Profile Card ── */
+.profile-card {
+    background: $surface-1;
+    border: 1px solid $border;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.avatar-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 24px 24px;
+    border-bottom: 1px solid $border;
+}
+
+.avatar-ring {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid $border-hi;
+    margin-bottom: 16px;
+}
+
+.avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.profile-name {
+    font-size: 18px;
+    font-weight: 500;
+    color: $white;
+    margin-bottom: 8px;
+}
+
+.profile-role-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: $g3;
+    border: 1px solid $border-hi;
+    border-radius: 999px;
+    padding: 3px 12px;
+}
+
+.profile-stats {
+    padding: 16px 24px;
+}
+
+.pstat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid $border;
+
+    &:last-child { border-bottom: none; }
+}
+
+.pstat-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: $g2;
+}
+
+.pstat-value {
+    font-size: 14px;
+    color: $g5;
+}
+
+/* ── Form Card ── */
+.form-card {
+    background: $surface-1;
+    border: 1px solid $border;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.form-header {
+    padding: 20px 28px;
+    border-bottom: 1px solid $border;
+}
+
+.form-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: $g3;
+}
+
+.form-body {
+    padding: 28px;
+}
+
+.form-group {
+    margin-bottom: 24px;
+
+    &:last-of-type { margin-bottom: 32px; }
+}
+
+.form-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: $g3;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.form-input {
+    width: 100%;
+    background: $surface-2;
+    border: 1px solid $border-hi;
     border-radius: 8px;
-    transition: all 0.3s;
+    padding: 12px 16px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    color: $white;
+    outline: none;
+    transition: border-color 150ms ease-out;
+    box-sizing: border-box;
+
+    &::placeholder { color: $g1; }
+    &:focus { border-color: $g4; }
+}
+
+.select-wrap {
+    position: relative;
+}
+
+.form-select {
+    width: 100%;
+    background: $surface-2;
+    border: 1px solid $border-hi;
+    border-radius: 8px;
+    padding: 12px 16px;
+    padding-right: 40px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    color: $white;
+    outline: none;
+    appearance: none;
+    cursor: pointer;
+    transition: border-color 150ms ease-out;
+    box-sizing: border-box;
+
+    &:focus { border-color: $g4; }
+}
+
+.select-arrow {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: $g3;
+    pointer-events: none;
+}
+
+.form-textarea {
+    width: 100%;
+    background: $surface-2;
+    border: 1px solid $border-hi;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    color: $white;
+    outline: none;
+    resize: vertical;
+    min-height: 100px;
+    transition: border-color 150ms ease-out;
+    box-sizing: border-box;
+
+    &::placeholder { color: $g1; }
+    &:focus { border-color: $g4; }
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 16px;
+    padding-top: 8px;
+    border-top: 1px solid $border;
+    padding-top: 24px;
+}
+
+.status-msg {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: $g4;
+}
+
+.btn-save {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 12px 28px;
+    border-radius: 999px;
+    border: 1px solid $pure;
+    background: transparent;
+    color: $pure;
+    cursor: pointer;
+    transition: all 150ms ease-out;
 
     &:hover {
-        box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.1);
-    }
-
-    .card-body {
-        padding: 20px 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-
-        .el-avatar {
-            border: 4px solid #f0f2f5;
-            margin-bottom: 15px;
-        }
-
-        p {
-            font-size: 16px;
-            color: #303133;
-            margin: 10px 0 5px;
-            font-weight: bold;
-        }
-
-        h5 {
-            font-size: 13px;
-            color: #909399;
-            font-weight: normal;
-            background: #f4f4f5;
-            padding: 4px 12px;
-            border-radius: 12px;
-            margin-top: 5px;
-        }
-    }
-}
-
-// 右侧信息卡片
-:deep(.el-card) {
-    border-radius: 8px;
-
-    .card-header {
-        display: flex;
-        align-items: center;
-        justify-content: center; // 标题居中，与你原图一致
-        font-size: 18px;
-        font-weight: 600;
-        color: #333;
-        padding: 10px 0;
-    }
-}
-
-// 表单美化
-.el-form {
-    padding: 10px 20px;
-
-    :deep(.el-form-item__label) {
-        font-weight: 600;
-        color: #606266;
-    }
-
-    // 调整保存按钮区域
-    .el-form-item:last-child {
-        margin-top: 30px;
-
-        .el-button {
-            width: 120px;
-            padding: 12px 20px;
-            font-size: 14px;
-        }
-    }
-}
-
-// 输入框聚焦时的平滑过渡
-:deep(.el-input__inner),
-:deep(.el-textarea__inner) {
-    transition: all 0.2s;
-
-    &:focus {
-        background-color: #fcfcfc;
+        background: $pure;
+        color: $black;
     }
 }
 </style>

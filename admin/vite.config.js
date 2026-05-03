@@ -19,6 +19,14 @@ export default defineConfig({
       '/avataruploads': {
         target: 'http://localhost:3000', // 目标服务器地址
         changeOrigin: true, // 是否改变请求源
+      },
+      '/newsuploads': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+      '/api': {
+        target: 'http://localhost:8000', // AI服务地址
+        changeOrigin: true,
       }
     }
   }

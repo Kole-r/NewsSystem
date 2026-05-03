@@ -7,6 +7,8 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const UserRouter = require('./routes/admin/UserRouter');
+const NewsRouter = require('./routes/admin/NewsRouter'); // 添加对 NewsRouter 的导入
+const chatRouter = require('./routes/chat');
 const JWT = require('./util/JWT');
 const authMiddleware = require('./middlewares/authMiddleware');
 
@@ -24,6 +26,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(authMiddleware);//JWT验证中间件
 // /adminApi/* - 后台管理系统接口
 app.use('/adminApi', UserRouter);
+app.use('/adminApi', NewsRouter);
+// /api/* - AI服务接口
+app.use('/api', chatRouter);
 // /webApi/* - 前台门户网站接口
 
 // catch 404 and forward to error handler

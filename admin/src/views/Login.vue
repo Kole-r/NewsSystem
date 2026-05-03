@@ -1,25 +1,69 @@
 <template>
-    <div>
-        <vue-particles id="tsparticles" :options="options" />
+    <div class="login-page">
+        <div class="dot-grid-bg"></div>
+
         <div class="login-container">
-            <h3>企业门户网络管理系统</h3>
-            <el-form ref="LoginFormRef" :model="LoginForm" status-icon :rules="Loginrules" label-width="80px"
-                class="login-form">
-                <el-form-item label="用户名" prop="username">
-                    <el-input v-model="LoginForm.username" autocomplete="off" />
+            <!-- Tertiary: system label -->
+            <span class="system-label">SMART EMPLOYMENT PLATFORM</span>
+
+            <!-- Primary: title -->
+            <h1 class="login-title">智就业</h1>
+            <p class="login-subtitle">智慧就业服务平台</p>
+
+            <!-- Secondary: form -->
+            <el-form
+                ref="LoginFormRef"
+                :model="LoginForm"
+                status-icon
+                :rules="Loginrules"
+                label-position="top"
+                class="login-form"
+            >
+                <el-form-item prop="username">
+                    <template #label>
+                        <span class="field-label">USERNAME</span>
+                    </template>
+                    <el-input
+                        v-model="LoginForm.username"
+                        autocomplete="off"
+                        placeholder="输入用户名"
+                        size="large"
+                    />
                 </el-form-item>
-                <el-form-item label="密码" prop="password">
-                    <el-input v-model="LoginForm.password" type="password" autocomplete="off" />
+                <el-form-item prop="password">
+                    <template #label>
+                        <span class="field-label">PASSWORD</span>
+                    </template>
+                    <el-input
+                        v-model="LoginForm.password"
+                        type="password"
+                        autocomplete="off"
+                        placeholder="输入密码"
+                        size="large"
+                        show-password
+                    />
                 </el-form-item>
-                <el-form-item>
-                    <el-button type="primary" @click="submitForm()">
-                        登陆
+                <el-form-item class="submit-item">
+                    <el-button
+                        type="primary"
+                        class="login-btn"
+                        @click="submitForm()"
+                    >
+                        SIGN IN
                     </el-button>
                 </el-form-item>
             </el-form>
+
+            <!-- Tertiary: footer -->
+            <div class="login-footer">
+                <span class="footer-text">v2.0.0</span>
+                <span class="footer-dot">·</span>
+                <span class="footer-text">EMPLOYMENT SERVICES</span>
+            </div>
         </div>
     </div>
 </template>
+
 <script setup>
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
@@ -27,19 +71,15 @@ import axios from '../util/axios.config.js'
 import { ElMessage } from 'element-plus'
 import useUserInfoStore from '../store/userInfo.js'
 
-
-//表单绑定的响应式对象
 const LoginForm = reactive({
     username: '',
     password: ''
 })
-//表单的引用对象
 const LoginFormRef = ref()
 
-// 表单验证规则
 const Loginrules = reactive({
     username: [
-        { required: true, message: '请输入用户名', trigger: 'blur', },
+        { required: true, message: '请输入用户名', trigger: 'blur' },
         { min: 3, max: 20, message: '长度在 3 到 20 个字符之间', trigger: 'blur' }
     ],
     password: [
@@ -47,168 +87,212 @@ const Loginrules = reactive({
         { min: 6, max: 20, message: '长度在 6 到 20 个字符之间', trigger: 'blur' }
     ]
 })
+
 const router = useRouter()
 const userInfoStore = useUserInfoStore()
-// 提交表单
+
 const submitForm = () => {
-    //1.表单验证
     LoginFormRef.value.validate((valid) => {
         if (valid) {
             axios.post("/adminApi/user/login", LoginForm).then(res => {
-                console.log('登录响应:', res.data);
                 if (res.data.code === 200) {
-                    // 登录成功
-                    console.log('登录成功！');
-                    // 存储token到localStorage
-                    // localStorage.setItem('token', res.data.data.token);
-                    console.log('登录响应数据:', res.data.data);
-                    userInfoStore.setUserInfo(res.data.data); // 存储用户信息到 Pinia Store
-                    console.log('用户信息:', userInfoStore.$state);
-                    // 跳转到首页
-                    router.push('/');
+                    userInfoStore.setUserInfo(res.data.data)
+                    router.push('/')
                 } else {
-                    // 登录失败
-                    ElMessage.error('Username or password is incorrect!!!');
-                    console.error('登录失败:', res.data.message);
+                    ElMessage.error('Username or password is incorrect!!!')
                 }
             }).catch(error => {
-                console.error('登录请求失败:', error);
-                if (error.response && error.response.data) {
-                    console.error('错误信息:', error.response.data.message);
-                }
-            });
+                console.error('登录请求失败:', error)
+            })
         }
-    });
-    //2.验证通过后，发送登录请求
-
-    //3.登录成功后，存储token，跳转首页
-}
-
-// 粒子背景配置
-const options = {
-    background: {
-        color: {
-            value: '#05131c'
-        }
-    },
-    fpsLimit: 120,
-    interactivity: {
-        events: {
-            onClick: {
-                enable: true,
-                mode: 'push'
-            },
-            onHover: {
-                enable: true,
-                mode: 'repulse'
-            },
-        },
-        modes: {
-            bubble: {
-                distance: 400,
-                duration: 2,
-                opacity: 0.8,
-                size: 40
-            },
-            push: {
-                quantity: 4
-            },
-            repulse: {
-                distance: 200,
-                duration: 0.4
-            }
-        }
-    },
-    particles: {
-        color: {
-            value: '#ffffff'
-        },
-        links: {
-            color: '#ffffff',
-            distance: 150,
-            enable: true,
-            opacity: 0.5,
-            width: 1
-        },
-        move: {
-            direction: 'none',
-            enable: true,
-            outModes: 'bounce',
-            random: false,
-            speed: 6,
-            straight: false
-        },
-        number: {
-            density: {
-                enable: true,
-            },
-            value: 80
-        },
-        opacity: {
-            value: 0.5
-        },
-        shape: {
-            type: 'circle'
-        },
-        size: {
-            value: { min: 1, max: 5 }
-        }
-    },
-    detectRetina: true
+    })
 }
 </script>
 
+<style lang="scss">
+@import url('https://fonts.googleapis.com/css2?family=Doto:wght@400;700&family=Space+Grotesk:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap');
+</style>
+
 <style scoped lang="scss">
+
+.login-page {
+    width: 100vw;
+    height: 100vh;
+    background-color: #000000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.dot-grid-bg {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, #222222 0.8px, transparent 0.8px);
+    background-size: 24px 24px;
+    opacity: 0.4;
+}
+
 .login-container {
-    width: 500px;
-    height: auto;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: rgba(255, 255, 255, 0.85);
-    color: #000;
-    text-align: center;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(10px);
+    position: relative;
+    z-index: 1;
+    width: 380px;
+    padding: 48px 40px;
+    background-color: #111111;
+    border: 1px solid #222222;
+    border-radius: 16px;
+}
 
-    .el-form {
-        margin-top: 10px;
+/* Tertiary: system label */
+.system-label {
+    display: block;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: #666666;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+}
+
+/* Primary: title */
+.login-title {
+    font-family: 'Doto', 'Space Mono', monospace;
+    font-size: 42px;
+    font-weight: 700;
+    color: #FFFFFF;
+    letter-spacing: -0.02em;
+    line-height: 1.0;
+    margin: 0;
+}
+
+.login-subtitle {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px;
+    font-weight: 300;
+    color: #999999;
+    margin: 8px 0 40px 0;
+    letter-spacing: 0.02em;
+}
+
+/* Secondary: form */
+.login-form {
+    :deep(.el-form-item) {
+        margin-bottom: 24px;
     }
 
-    .el-button {
-        width: 50%;
-        margin-top: 15px;
-        border-radius: 6px;
-        padding: 12px 0;
+    :deep(.el-form-item__label) {
+        font-family: 'Space Mono', monospace;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        color: #999999;
+        text-transform: uppercase;
+        line-height: 1;
+        padding-bottom: 8px !important;
     }
 
-    .el-input {
-        border-radius: 6px;
-        margin-bottom: 5px;
+    :deep(.el-input__wrapper) {
+        background-color: transparent;
+        border: none;
+        border-bottom: 1px solid #333333;
+        border-radius: 0;
+        box-shadow: none !important;
+        padding: 4px 0;
+        transition: border-color 200ms ease;
+
+        &:hover {
+            border-bottom-color: #666666;
+        }
     }
 
-    h2 {
-        margin-bottom: 25px;
-        color: #2c3e50;
-        font-weight: 500;
+    :deep(.el-input.is-focus .el-input__wrapper) {
+        border-bottom-color: #E8E8E8;
     }
 
-    h3 {
-        margin-bottom: 20px;
-        color: #2c3e50;
-        font-weight: 400;
+    :deep(.el-input__inner) {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 16px;
+        color: #E8E8E8;
+        letter-spacing: 0;
+
+        &::placeholder {
+            color: #666666;
+        }
     }
 
-    .login-from {
-        margin-top: 20px;
+    :deep(.el-input__suffix) {
+        color: #666666;
     }
 }
 
-:deep(.el-form-item__label) {
-    color: #34495e;
-    font-weight: 500;
+.field-label {
+    font-family: 'Space Mono', monospace;
+}
+
+.submit-item {
+    margin-top: 8px;
+    margin-bottom: 0;
+
+    :deep(.el-form-item__content) {
+        margin-left: 0 !important;
+    }
+}
+
+.login-btn {
+    width: 100%;
+    height: 48px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: 999px;
+    border: none;
+    background-color: #FFFFFF;
+    color: #000000;
+    transition: opacity 200ms ease;
+
+    &:hover {
+        opacity: 0.85;
+    }
+
+    &:active {
+        opacity: 0.7;
+    }
+}
+
+/* Tertiary: footer */
+.login-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid #222222;
+}
+
+.footer-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: #666666;
+    text-transform: uppercase;
+}
+
+.footer-dot {
+    color: #333333;
+    font-size: 14px;
+}
+
+/* Error state override */
+:deep(.el-form-item.is-error .el-input__wrapper) {
+    border-bottom-color: #D71921 !important;
+}
+
+:deep(.el-form-item__error) {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: #D71921;
+    letter-spacing: 0.04em;
 }
 </style>

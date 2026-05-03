@@ -1,147 +1,261 @@
 <template>
-    <el-aside width=auto>
-        <el-menu :collapse="collapseStore.isCollapsed"
-        :collapse-transition="false"
-        :router="true"
-        :default-active="route.fullPath"> <!-- 绑定状态 -->
-            <el-menu-item index="/home">
-                <el-icon>
-                    <HomeFilled />
-                </el-icon>
-                <span>首页</span>
-            </el-menu-item>
-            <el-menu-item index="/center">
-                <el-icon>
-                    <UserFilled />
-                </el-icon>
-                <span>个人中心</span>
-            </el-menu-item>
+    <el-aside width="auto" class="side-aside">
+        <div class="side-inner" :class="{ collapsed: collapseStore.isCollapsed }">
+            <!-- Logo -->
+            <div class="side-logo">
+                <span class="logo-mark">N</span>
+                <Transition name="label-fade">
+                    <span v-if="!collapseStore.isCollapsed" class="logo-text">NEWSYS</span>
+                </Transition>
+            </div>
 
-            <el-sub-menu index="/user-management" v-admin>
-                <template #title>
-                    <el-icon>
-                        <Avatar />
-                    </el-icon>
-                    <span>用户管理</span>
-                </template>
-                <el-menu-item index="/user-management/UserAdd">添加用户</el-menu-item>
-                <el-menu-item index="/user-management/UserList">用户列表</el-menu-item>
-            </el-sub-menu>
+            <el-menu
+                :collapse="collapseStore.isCollapsed"
+                :collapse-transition="false"
+                :router="true"
+                :default-active="route.fullPath"
+                class="side-menu"
+            >
+                <el-menu-item index="/home">
+                    <el-icon><HomeFilled /></el-icon>
+                    <template #title>首页</template>
+                </el-menu-item>
+                <el-menu-item index="/center">
+                    <el-icon><UserFilled /></el-icon>
+                    <template #title>个人中心</template>
+                </el-menu-item>
 
-            <el-sub-menu index="/news-management">
-                <template #title>
-                    <el-icon>
-                        <Management />
-                    </el-icon>
-                    <span>新闻管理</span>
-                </template>
-                <el-menu-item index="/news-management/NewsAdd">添加新闻</el-menu-item>
-                <el-menu-item index="/news-management/NewsList">新闻列表</el-menu-item>
-            </el-sub-menu>
+                <el-sub-menu index="/user-management" v-admin>
+                    <template #title>
+                        <el-icon><Avatar /></el-icon>
+                        <span>用户管理</span>
+                    </template>
+                    <el-menu-item index="/user-management/UserAdd">添加用户</el-menu-item>
+                    <el-menu-item index="/user-management/UserList">用户列表</el-menu-item>
+                </el-sub-menu>
 
-            <el-sub-menu index="/product-management">
-                <template #title>
-                    <el-icon>
-                        <Reading />
-                    </el-icon>
-                    <span>产品管理</span>
-                </template>
-                <el-menu-item index="/product-management/ProductAdd">添加产品</el-menu-item>
-                <el-menu-item index="/product-management/ProductList">产品列表</el-menu-item>
-            </el-sub-menu>
+                <el-sub-menu index="/news-management">
+                    <template #title>
+                        <el-icon><Management /></el-icon>
+                        <span>新闻管理</span>
+                    </template>
+                    <el-menu-item index="/news-management/NewsAdd">添加新闻</el-menu-item>
+                    <el-menu-item index="/news-management/NewsList">新闻列表</el-menu-item>
+                </el-sub-menu>
 
+                <el-sub-menu index="/product-management">
+                    <template #title>
+                        <el-icon><Reading /></el-icon>
+                        <span>产品管理</span>
+                    </template>
+                    <el-menu-item index="/product-management/ProductAdd">添加产品</el-menu-item>
+                    <el-menu-item index="/product-management/ProductList">产品列表</el-menu-item>
+                </el-sub-menu>
+            </el-menu>
 
-        </el-menu>
+            <!-- 底部版本号 -->
+            <div class="side-footer">
+                <span class="footer-ver">v1.0</span>
+            </div>
+        </div>
     </el-aside>
 </template>
-<script setup>
-import { HomeFilled, UserFilled, Avatar, Promotion, Management, Reading } from '@element-plus/icons-vue'
-import { useCollapseStore } from '../../store/collapse.js'// 导入 Pinia Store
-import { useRoute } from 'vue-router';
-import { useUserInfoStore } from '../../store/userInfo.js';
 
-            
-const collapseStore = useCollapseStore(); // 获取 Pinia Store
-const route = useRoute();
-const userInfo = useUserInfoStore();
-console.log('当前用户角色:', userInfo.$state.role);
-const vAdmin={
+<script setup>
+import { HomeFilled, UserFilled, Avatar, Management, Reading } from '@element-plus/icons-vue'
+import { useCollapseStore } from '../../store/collapse.js'
+import { useRoute } from 'vue-router'
+import { useUserInfoStore } from '../../store/userInfo.js'
+
+const collapseStore = useCollapseStore()
+const route = useRoute()
+const userInfo = useUserInfoStore()
+
+const vAdmin = {
     mounted(el) {
         if (userInfo.$state.role !== 1) {
-            el.parentNode && el.parentNode.removeChild(el);
+            el.parentNode && el.parentNode.removeChild(el)
         }
     }
-};
-
+}
 </script>
 
 <style scoped lang="scss">
-// 侧边栏容器
-.el-aside {
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap');
+
+/* ── Tokens ── */
+$black: #000000;
+$surface: #080808;
+$border: #1A1A1A;
+$g1: #333333;
+$g2: #555555;
+$g3: #888888;
+$g5: #CCCCCC;
+$white: #F0F0F0;
+$pure: #FFFFFF;
+$accent: #D71921;
+
+.side-aside {
     min-height: 100vh;
-    height: auto;
-    box-shadow: 2px 0 6px rgba(0, 0, 0, 0.05);
+    background: $black;
+    border-right: 1px solid $border;
+    overflow: hidden;
+}
 
-    .el-menu {
-        height: 100%;
-        border-right: none;
+.side-inner {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 220px;
+    transition: width 200ms ease-out;
 
-        // --- 亮色主题 Element Plus 变量配置 ---
-        --el-menu-text-color: #333;
-        --el-menu-hover-text-color: #409eff;
-        --el-menu-hover-bg-color: #f4f5f7;
-        --el-menu-active-color: #409eff;
-        --el-menu-bg-color: #ffffff;
-        --el-menu-item-height: 48px; // 统一高度
-        --el-menu-sub-item-height: 48px; // 统一子项高度
-
-        // 确保所有一级菜单项和标题高度一致，并禁用文本选择
-        :deep(.el-menu-item),
-        :deep(.el-sub-menu__title) {
-            height: var(--el-menu-item-height); // 强制使用统一高度
-            line-height: var(--el-menu-item-height); // 保证文字垂直居中
-            padding-left: 20px !important;
-
-            // 禁用文本选中
-            user-select: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-
-            transition: all 0.3s ease;
-        }
-
-        // 菜单项激活时的样式 (适用于 **纯一级菜单** 和 **二级菜单项**)
-        .el-menu-item.is-active {
-            background-color: #ecf5ff; // 激活背景色
-            color: #409eff;
-            font-weight: bold;
-            // 侧边高亮条
-            border-left: 4px solid #409eff;
-        }
-
-
-        // 当 SubMenu 被打开时，给它的标题应用高亮样式
-        :deep(.el-sub-menu.is-opened)>.el-sub-menu__title {
-            background-color: #f4f5f7 !important;
-            /* 可以使用hover色或浅蓝色 */
-            color: #409eff !important;
-        }
-
-        // 当 SubMenu 的子项处于激活状态时，保持一级标题高亮
-        :deep(.el-sub-menu.is-active)>.el-sub-menu__title {
-            background-color: #f4f5f7 !important;
-            color: #409eff !important;
-        }
-
-
-        // 图标的样式
-        .el-icon {
-            font-size: 18px;
-            margin-right: 8px;
-        }
-
-        // 折叠状态下的优化... (略)
+    &.collapsed {
+        width: 64px;
     }
+}
+
+/* ── Logo ── */
+.side-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 24px 20px 32px;
+    flex-shrink: 0;
+}
+
+.logo-mark {
+    font-family: 'Space Mono', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    color: $black;
+    background: $pure;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.logo-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: $pure;
+    white-space: nowrap;
+}
+
+/* ── Menu ── */
+.side-menu {
+    flex: 1;
+    border-right: none;
+    background: transparent;
+    padding: 0 8px;
+
+    /* Element Plus 变量覆盖 */
+    --el-menu-bg-color: transparent;
+    --el-menu-text-color: #888888;
+    --el-menu-hover-text-color: #F0F0F0;
+    --el-menu-hover-bg-color: #0A0A0A;
+    --el-menu-active-color: #F0F0F0;
+    --el-menu-item-height: 44px;
+    --el-menu-sub-item-height: 40px;
+    --el-menu-base-level-padding: 12px;
+    --el-menu-level-padding: 12px;
+
+    /* 一级菜单项 */
+    :deep(.el-menu-item),
+    :deep(.el-sub-menu__title) {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 14px;
+        font-weight: 400;
+        border-radius: 8px;
+        margin-bottom: 2px;
+        padding-left: 14px !important;
+        transition: all 150ms ease-out;
+        user-select: none;
+
+        &:hover {
+            background: #0A0A0A;
+            color: $white;
+        }
+    }
+
+    /* 激活项 */
+    :deep(.el-menu-item.is-active) {
+        background: #111111;
+        color: $pure;
+        font-weight: 500;
+        position: relative;
+
+        &::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            bottom: 8px;
+            width: 3px;
+            background: $accent;
+            border-radius: 0 2px 2px 0;
+        }
+    }
+
+    /* SubMenu 打开时标题高亮 */
+    :deep(.el-sub-menu.is-opened > .el-sub-menu__title),
+    :deep(.el-sub-menu.is-active > .el-sub-menu__title) {
+        color: $white !important;
+        background: #0A0A0A !important;
+    }
+
+    /* 子菜单项 */
+    :deep(.el-menu-item) {
+        font-size: 13px;
+        padding-left: 44px !important;
+        color: $g3;
+
+        &.is-active {
+            color: $pure;
+            background: #111111;
+        }
+    }
+
+    /* 图标 */
+    :deep(.el-icon) {
+        font-size: 18px;
+        margin-right: 8px;
+        color: inherit;
+    }
+
+    /* SubMenu 箭头 */
+    :deep(.el-sub-menu__icon-arrow) {
+        color: $g2;
+        font-size: 12px;
+    }
+}
+
+/* ── Footer ── */
+.side-footer {
+    padding: 16px 20px 24px;
+    flex-shrink: 0;
+}
+
+.footer-ver {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: $g1;
+}
+
+/* ── Transition ── */
+.label-fade-enter-active,
+.label-fade-leave-active {
+    transition: opacity 150ms ease-out;
+}
+
+.label-fade-enter-from,
+.label-fade-leave-to {
+    opacity: 0;
 }
 </style>

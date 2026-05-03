@@ -13,9 +13,11 @@ import { Plus } from '@element-plus/icons-vue';
 const props = defineProps({
     avatar:String
 })
+// 定义事件koleChange可以被父组件监听
 const emit = defineEmits(["koleChange"])
 // 计算属性动态生成上传后的头像 URL
 const uploadAvatar = computed(() => props.avatar);
+// 处理文件变化事件 
 const handChange = (file) => {
     emit("koleChange",file.raw)
 };

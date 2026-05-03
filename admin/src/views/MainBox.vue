@@ -16,10 +16,10 @@ import SideMenu from '../components/mainbox/SideMenu.vue';
 </script>
 <style lang="scss" scoped>
 .el-main {
-    overflow:auto;
-    padding: 20px;
-    height: calc(100vh - 112px);
-    background-color: #f5f7fa;
-    min-height: calc(100vh - 64px);
+    overflow: auto;
+    padding: 24px;
+    height: calc(100vh - 56px);
+    background-color: #111111;
+    min-height: calc(100vh - 56px);
 }
 </style>
