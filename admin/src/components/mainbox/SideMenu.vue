@@ -3,9 +3,9 @@
         <div class="side-inner" :class="{ collapsed: collapseStore.isCollapsed }">
             <!-- Logo -->
             <div class="side-logo">
-                <span class="logo-mark">N</span>
+                <span class="logo-mark">E</span>
                 <Transition name="label-fade">
-                    <span v-if="!collapseStore.isCollapsed" class="logo-text">NEWSYS</span>
+                    <span v-if="!collapseStore.isCollapsed" class="logo-text">EMPLOY</span>
                 </Transition>
             </div>
 
@@ -43,13 +43,13 @@
                     <el-menu-item index="/news-management/NewsList">新闻列表</el-menu-item>
                 </el-sub-menu>
 
-                <el-sub-menu index="/product-management">
+                <el-sub-menu index="/job-management">
                     <template #title>
-                        <el-icon><Reading /></el-icon>
-                        <span>产品管理</span>
+                        <el-icon><Briefcase /></el-icon>
+                        <span>岗位管理</span>
                     </template>
-                    <el-menu-item index="/product-management/ProductAdd">添加产品</el-menu-item>
-                    <el-menu-item index="/product-management/ProductList">产品列表</el-menu-item>
+                    <el-menu-item index="/job-management/JobAdd">发布岗位</el-menu-item>
+                    <el-menu-item index="/job-management/JobList">岗位列表</el-menu-item>
                 </el-sub-menu>
             </el-menu>
 
@@ -62,7 +62,7 @@
 </template>
 
 <script setup>
-import { HomeFilled, UserFilled, Avatar, Management, Reading } from '@element-plus/icons-vue'
+import { HomeFilled, UserFilled, Avatar, Management, Briefcase } from '@element-plus/icons-vue'
 import { useCollapseStore } from '../../store/collapse.js'
 import { useRoute } from 'vue-router'
 import { useUserInfoStore } from '../../store/userInfo.js'
@@ -81,8 +81,6 @@ const vAdmin = {
 </script>
 
 <style scoped lang="scss">
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap');
-
 /* ── Tokens ── */
 $black: #000000;
 $surface: #080808;

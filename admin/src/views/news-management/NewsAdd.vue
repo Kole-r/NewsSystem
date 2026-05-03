@@ -38,10 +38,10 @@
                         <div class="select-wrap">
                             <select v-model="newsForm.category" class="form-select">
                                 <option :value="null" disabled>请选择类别</option>
-                                <option :value="1">国内</option>
-                                <option :value="2">国际</option>
-                                <option :value="3">体育</option>
-                                <option :value="4">娱乐</option>
+                                <option :value="1">政策解读</option>
+                                <option :value="2">行业动态</option>
+                                <option :value="3">求职技巧</option>
+                                <option :value="4">校园招聘</option>
                             </select>
                             <span class="select-arrow">&#9662;</span>
                         </div>
@@ -61,7 +61,7 @@
                 </div>
             </div>
         </div>
-        <chatBot />
+        <AdminChatBot :context="`新闻标题: ${newsForm.title}\n新闻内容: ${newsForm.content}`" />
     </div>
 </template>
 
@@ -69,7 +69,7 @@
 import Upload from '@/components/upload/Upload.vue';
 import upload from '@/util/upload.js';
 import editor from '@/components/Editor/editor.vue';
-import chatBot from '@/components/ChatBot.vue';
+import AdminChatBot from '@/components/AdminChatBot.vue';
 import { reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -166,8 +166,6 @@ const submitForm = async () => {
 </script>
 
 <style lang="scss" scoped>
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap');
-
 /* ── Tokens ── */
 $black: #000000;
 $surface: #0A0A0A;
@@ -223,6 +221,7 @@ $green: #3DDC84;
     border-radius: 12px;
     overflow: hidden;
     max-width: 800px;
+    margin: 0 auto;
 }
 
 .form-header {

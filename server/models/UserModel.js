@@ -28,10 +28,10 @@ const findAll = async () => {
 
 // 创建用户
 const create = async (userData) => {
-  const { username, password, gender, introduction, avatar, role } = userData;
+  const { username, password, role, real_name, phone, email, avatar, major, degree, graduation_year, university, city_preference, job_preference, bio, status } = userData;
   const [result] = await db.query(
-    'INSERT INTO users (username, password, gender, introduction, avatar, role) VALUES (?, ?, ?, ?, ?, ?)',
-    [username, password, gender, introduction, avatar, role]
+    'INSERT INTO users (username, password, role, real_name, phone, email, avatar, major, degree, graduation_year, university, city_preference, job_preference, bio, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    [username, password, role, real_name, phone, email, avatar, major, degree, graduation_year, university, city_preference, job_preference, bio, status]
   );
   return result.insertId;
 };

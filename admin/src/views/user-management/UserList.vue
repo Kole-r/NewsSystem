@@ -15,6 +15,10 @@
                     <span class="stat-num">{{ tableData.filter(u => u.role === 1).length }}</span>
                     <span class="stat-label">ADMINS</span>
                 </div>
+                <div class="stat-block">
+                    <span class="stat-num">{{ tableData.filter(u => u.role === 0).length }}</span>
+                    <span class="stat-label">GRADUATES</span>
+                </div>
             </div>
         </div>
 
@@ -29,8 +33,12 @@
                         <th class="col-index">#</th>
                         <th class="col-avatar">头像</th>
                         <th class="col-name">用户名</th>
+                        <th class="col-realname">真实姓名</th>
                         <th class="col-role">角色</th>
-                        <th class="col-intro">简介</th>
+                        <th class="col-major">专业</th>
+                        <th class="col-degree">学历</th>
+                        <th class="col-phone">手机号</th>
+                        <th class="col-status">状态</th>
                         <th class="col-actions">操作</th>
                     </tr>
                 </thead>
@@ -45,13 +53,27 @@
                         <td class="col-name">
                             <span class="name-text">{{ item.username }}</span>
                         </td>
+                        <td class="col-realname">
+                            <span class="cell-text">{{ item.real_name || '—' }}</span>
+                        </td>
                         <td class="col-role">
-                            <span :class="['role-pill', item.role === 1 ? 'admin' : 'editor']">
-                                {{ item.role === 1 ? '管理员' : '编辑者' }}
+                            <span :class="['role-pill', item.role === 1 ? 'admin' : 'graduate']">
+                                {{ item.role === 1 ? '管理员' : '毕业生' }}
                             </span>
                         </td>
-                        <td class="col-intro">
-                            <span class="intro-text">{{ item.introduction || '—' }}</span>
+                        <td class="col-major">
+                            <span class="cell-text">{{ item.major || '—' }}</span>
+                        </td>
+                        <td class="col-degree">
+                            <span class="cell-text">{{ item.degree || '—' }}</span>
+                        </td>
+                        <td class="col-phone">
+                            <span class="cell-text">{{ item.phone || '—' }}</span>
+                        </td>
+                        <td class="col-status">
+                            <span :class="['status-pill', item.status === 1 ? 'active' : 'disabled']">
+                                {{ item.status === 1 ? '正常' : '禁用' }}
+                            </span>
                         </td>
                         <td class="col-actions">
                             <button class="abtn abtn-edit" @click="handleEdit(item)">编辑</button>
@@ -76,27 +98,93 @@
                             <button class="modal-close" @click="editVisible = false">&times;</button>
                         </div>
                         <div class="edit-scroll">
-                            <div class="form-group">
-                                <label class="form-label">用户名</label>
-                                <input v-model="userForm.username" type="text" class="form-input" placeholder="请输入用户名" />
+                            <div class="form-row">
+                                <div class="form-group form-group-half">
+                                    <label class="form-label">用户名</label>
+                                    <input v-model="userForm.username" type="text" class="form-input" placeholder="请输入用户名" />
+                                </div>
+                                <div class="form-group form-group-half">
+                                    <label class="form-label">密码</label>
+                                    <input v-model="userForm.password" type="password" class="form-input" placeholder="留空则不修改" />
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">密码</label>
-                                <input v-model="userForm.password" type="password" class="form-input" placeholder="留空则不修改" />
+                            <div class="form-row">
+                                <div class="form-group form-group-half">
+                                    <label class="form-label">角色</label>
+                                    <div class="select-wrap">
+                                        <select v-model="userForm.role" class="form-select">
+                                            <option value="1">管理员</option>
+                                            <option value="0">毕业生</option>
+                                        </select>
+                                        <span class="select-arrow">&#9662;</span>
+                                    </div>
+                                </div>
+                                <div class="form-group form-group-half">
+                                    <label class="form-label">状态</label>
+                                    <div class="select-wrap">
+                                        <select v-model="userForm.status" class="form-select">
+                                            <option value="1">正常</option>
+                                            <option value="0">禁用</option>
+                                        </select>
+                                        <span class="select-arrow">&#9662;</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">角色</label>
-                                <div class="select-wrap">
-                                    <select v-model="userForm.role" class="form-select">
-                                        <option value="1">管理员</option>
-                                        <option value="2">编辑者</option>
-                                    </select>
-                                    <span class="select-arrow">&#9662;</span>
+                            <div class="form-row">
+                                <div class="form-group form-group-half">
+                                    <label class="form-label">真实姓名</label>
+                                    <input v-model="userForm.real_name" type="text" class="form-input" placeholder="请输入真实姓名" />
+                                </div>
+                                <div class="form-group form-group-half">
+                                    <label class="form-label">手机号</label>
+                                    <input v-model="userForm.phone" type="text" class="form-input" placeholder="请输入手机号" />
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group form-group-half">
+                                    <label class="form-label">邮箱</label>
+                                    <input v-model="userForm.email" type="text" class="form-input" placeholder="请输入邮箱" />
+                                </div>
+                                <div class="form-group form-group-half">
+                                    <label class="form-label">毕业院校</label>
+                                    <input v-model="userForm.university" type="text" class="form-input" placeholder="请输入毕业院校" />
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group form-group-half">
+                                    <label class="form-label">专业</label>
+                                    <input v-model="userForm.major" type="text" class="form-input" placeholder="请输入专业" />
+                                </div>
+                                <div class="form-group form-group-half">
+                                    <label class="form-label">学历</label>
+                                    <div class="select-wrap">
+                                        <select v-model="userForm.degree" class="form-select">
+                                            <option value="">请选择</option>
+                                            <option value="本科">本科</option>
+                                            <option value="硕士">硕士</option>
+                                            <option value="博士">博士</option>
+                                        </select>
+                                        <span class="select-arrow">&#9662;</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group form-group-half">
+                                    <label class="form-label">毕业年份</label>
+                                    <input v-model="userForm.graduation_year" type="number" class="form-input" placeholder="如 2025" />
+                                </div>
+                                <div class="form-group form-group-half">
+                                    <label class="form-label">意向城市</label>
+                                    <input v-model="userForm.city_preference" type="text" class="form-input" placeholder="如 北京,上海" />
                                 </div>
                             </div>
                             <div class="form-group">
+                                <label class="form-label">意向岗位</label>
+                                <input v-model="userForm.job_preference" type="text" class="form-input" placeholder="如 技术,产品,运营" />
+                            </div>
+                            <div class="form-group">
                                 <label class="form-label">个人简介</label>
-                                <textarea v-model="userForm.introduction" class="form-textarea" rows="3" placeholder="请输入个人简介"></textarea>
+                                <textarea v-model="userForm.bio" class="form-textarea" rows="3" placeholder="请输入个人简介"></textarea>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">头像</label>
@@ -117,19 +205,32 @@
 <script setup>
 import { ref, onMounted, reactive } from 'vue';
 import axios from '../../util/axios.config.js';
+import upload from '../../util/upload.js';
 import Upload from '@/components/upload/Upload.vue';
+import useUserInfoStore from '../../store/userInfo.js';
 
 const editVisible = ref(false);
 const currentUserId = ref(null);
 const statusMsg = ref('');
 const tableData = ref([]);
+const userInfo = useUserInfoStore();
 
 const userForm = reactive({
     username: '',
     password: '',
-    role: '2',
-    introduction: '',
+    role: '0',
+    status: '1',
+    real_name: '',
+    phone: '',
+    email: '',
     avatar: '',
+    major: '',
+    degree: '',
+    graduation_year: '',
+    university: '',
+    city_preference: '',
+    job_preference: '',
+    bio: '',
 });
 
 const showStatus = (msg) => {
@@ -148,10 +249,31 @@ const handleConfirm = async () => {
         return;
     }
     try {
-        await axios.put(`/adminApi/user/list/${currentUserId.value}`, userForm);
+        await upload(`/adminApi/user/list/${currentUserId.value}`, userForm, 'put');
         editVisible.value = false;
         showStatus('[SAVED]');
         fetchUserList();
+        // 如果编辑的是当前登录用户，同步更新 store
+        if (String(currentUserId.value) === String(userInfo.$state.id)) {
+            const res = await axios.get(`/adminApi/user/list/${currentUserId.value}`);
+            const userData = res.data.data[0];
+            userInfo.setUserInfo({
+                ...userInfo.$state,
+                username: userData.username,
+                role: userData.role,
+                avatar: userData.avatar,
+                real_name: userData.real_name,
+                phone: userData.phone,
+                email: userData.email,
+                major: userData.major,
+                degree: userData.degree,
+                graduation_year: userData.graduation_year,
+                university: userData.university,
+                city_preference: userData.city_preference,
+                job_preference: userData.job_preference,
+                bio: userData.bio,
+            });
+        }
     } catch (error) {
         showStatus('[ERROR] 更新失败');
     }
@@ -173,10 +295,20 @@ const handleEdit = async (data) => {
         const res = await axios.get(`/adminApi/user/list/${data.id}`);
         const userData = res.data.data[0];
         currentUserId.value = userData.id;
-        userForm.username = userData.username;
+        userForm.username = userData.username || '';
         userForm.role = String(userData.role);
-        userForm.introduction = userData.introduction || '';
+        userForm.status = String(userData.status !== undefined ? userData.status : 1);
+        userForm.real_name = userData.real_name || '';
+        userForm.phone = userData.phone || '';
+        userForm.email = userData.email || '';
         userForm.avatar = userData.avatar || '';
+        userForm.major = userData.major || '';
+        userForm.degree = userData.degree || '';
+        userForm.graduation_year = userData.graduation_year || '';
+        userForm.university = userData.university || '';
+        userForm.city_preference = userData.city_preference || '';
+        userForm.job_preference = userData.job_preference || '';
+        userForm.bio = userData.bio || '';
         userForm.password = '';
         editVisible.value = true;
     } catch (error) {
@@ -196,8 +328,6 @@ const handleDelete = async (data) => {
 </script>
 
 <style lang="scss" scoped>
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap');
-
 /* ── Tokens ── */
 $black: #000000;
 $surface: #0A0A0A;
@@ -291,11 +421,13 @@ $blue: #5B9BF6;
     border-radius: 12px;
     overflow: hidden;
     background: $surface;
+    overflow-x: auto;
 }
 
 .data-table {
     width: 100%;
     border-collapse: collapse;
+    min-width: 900px;
 
     th {
         font-family: 'Space Mono', monospace;
@@ -307,6 +439,7 @@ $blue: #5B9BF6;
         padding: 14px 16px;
         border-bottom: 1px solid $border-hi;
         background: $surface-1;
+        white-space: nowrap;
     }
 
     td {
@@ -315,6 +448,7 @@ $blue: #5B9BF6;
         vertical-align: middle;
         font-size: 14px;
         color: $g5;
+        white-space: nowrap;
     }
 
     tbody tr {
@@ -349,14 +483,19 @@ $blue: #5B9BF6;
     }
 }
 
-.col-name { min-width: 140px; }
+.col-name { min-width: 120px; }
 
 .name-text {
     color: $white;
     font-weight: 500;
 }
 
-.col-role { width: 100px; }
+.cell-text {
+    font-size: 13px;
+    color: $g4;
+}
+
+.col-role { width: 90px; }
 
 .role-pill {
     font-family: 'Space Mono', monospace;
@@ -370,23 +509,30 @@ $blue: #5B9BF6;
         border-color: $accent;
         color: $accent;
     }
-    &.editor {
-        border-color: $border-hi;
-        color: $g4;
+    &.graduate {
+        border-color: $blue;
+        color: $blue;
     }
 }
 
-.col-intro {
-    max-width: 260px;
-}
+.col-status { width: 80px; }
 
-.intro-text {
-    font-size: 13px;
-    color: $g3;
-    display: -webkit-box;
-    -webkit-line-clamp: 1;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+.status-pill {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    border: 1px solid;
+    border-radius: 999px;
+    padding: 3px 10px;
+
+    &.active {
+        border-color: $green;
+        color: $green;
+    }
+    &.disabled {
+        border-color: $accent;
+        color: $accent;
+    }
 }
 
 .col-actions { width: 160px; }
@@ -468,7 +614,7 @@ $blue: #5B9BF6;
     background: $surface;
     border: 1px solid $border-hi;
     border-radius: 16px;
-    width: 560px;
+    width: 640px;
     max-height: 85vh;
     display: flex;
     flex-direction: column;
@@ -518,6 +664,15 @@ $blue: #5B9BF6;
 }
 
 /* ── Form ── */
+.form-row {
+    display: flex;
+    gap: 16px;
+}
+
+.form-group-half {
+    flex: 1;
+}
+
 .form-group {
     margin-bottom: 20px;
 

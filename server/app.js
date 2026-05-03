@@ -7,7 +7,12 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const UserRouter = require('./routes/admin/UserRouter');
-const NewsRouter = require('./routes/admin/NewsRouter'); // 添加对 NewsRouter 的导入
+const NewsRouter = require('./routes/admin/NewsRouter');
+const JobRouter = require('./routes/admin/JobRouter');
+const AIRouter = require('./routes/admin/ai');
+const WebUserRouter = require('./routes/web/UserRouter');
+const WebNewsRouter = require('./routes/web/NewsRouter');
+const WebJobRouter = require('./routes/web/JobRouter');
 const chatRouter = require('./routes/chat');
 const JWT = require('./util/JWT');
 const authMiddleware = require('./middlewares/authMiddleware');
@@ -27,9 +32,14 @@ app.use(authMiddleware);//JWT验证中间件
 // /adminApi/* - 后台管理系统接口
 app.use('/adminApi', UserRouter);
 app.use('/adminApi', NewsRouter);
+app.use('/adminApi', JobRouter);
+app.use('/adminApi', AIRouter);
 // /api/* - AI服务接口
 app.use('/api', chatRouter);
 // /webApi/* - 前台门户网站接口
+app.use('/webApi', WebUserRouter);
+app.use('/webApi', WebNewsRouter);
+app.use('/webApi', WebJobRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

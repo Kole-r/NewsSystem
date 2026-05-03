@@ -5,7 +5,7 @@ const pool = mysql.createPool({
     host: 'localhost', // 数据库地址
     user: 'root',      // 数据库用户名
     password: '22222222', // 数据库密码
-    database: 'news', // 数据库名称
+    database: 'employment_platform', // 数据库名称
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0

@@ -16,21 +16,37 @@
                     <div class="avatar-ring">
                         <img :src="avatarUrl" alt="avatar" class="avatar-img" />
                     </div>
-                    <span class="profile-name">{{ username }}</span>
-                    <span class="profile-role-tag">{{ role === 1 ? '管理员' : '编辑者' }}</span>
+                    <span class="profile-name">{{ userInfo.$state.real_name || userInfo.$state.username }}</span>
+                    <span class="profile-role-tag">{{ role === 1 ? '管理员' : '毕业生' }}</span>
                 </div>
                 <div class="profile-stats">
                     <div class="pstat-row">
                         <span class="pstat-label">USERNAME</span>
-                        <span class="pstat-value">{{ username }}</span>
+                        <span class="pstat-value">{{ userInfo.$state.username }}</span>
                     </div>
                     <div class="pstat-row">
                         <span class="pstat-label">ROLE</span>
-                        <span class="pstat-value">{{ role === 1 ? '管理员' : '编辑者' }}</span>
+                        <span class="pstat-value">{{ role === 1 ? '管理员' : '毕业生' }}</span>
                     </div>
                     <div class="pstat-row">
-                        <span class="pstat-label">GENDER</span>
-                        <span class="pstat-value">{{ genderLabel }}</span>
+                        <span class="pstat-label">PHONE</span>
+                        <span class="pstat-value">{{ userInfo.$state.phone || '—' }}</span>
+                    </div>
+                    <div class="pstat-row">
+                        <span class="pstat-label">EMAIL</span>
+                        <span class="pstat-value">{{ userInfo.$state.email || '—' }}</span>
+                    </div>
+                    <div class="pstat-row">
+                        <span class="pstat-label">MAJOR</span>
+                        <span class="pstat-value">{{ userInfo.$state.major || '—' }}</span>
+                    </div>
+                    <div class="pstat-row">
+                        <span class="pstat-label">DEGREE</span>
+                        <span class="pstat-value">{{ userInfo.$state.degree || '—' }}</span>
+                    </div>
+                    <div class="pstat-row">
+                        <span class="pstat-label">UNIVERSITY</span>
+                        <span class="pstat-value">{{ userInfo.$state.university || '—' }}</span>
                     </div>
                 </div>
             </div>
@@ -41,34 +57,67 @@
                     <span class="form-tag">EDIT PROFILE</span>
                 </div>
                 <div class="form-body">
-                    <div class="form-group">
-                        <label class="form-label">用户名</label>
-                        <input
-                            v-model="userForm.username"
-                            type="text"
-                            class="form-input"
-                            placeholder="请输入用户名"
-                        />
+                    <div class="form-row">
+                        <div class="form-group form-group-half">
+                            <label class="form-label">用户名</label>
+                            <input v-model="userForm.username" type="text" class="form-input" placeholder="请输入用户名" />
+                        </div>
+                        <div class="form-group form-group-half">
+                            <label class="form-label">真实姓名</label>
+                            <input v-model="userForm.real_name" type="text" class="form-input" placeholder="请输入真实姓名" />
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">性别</label>
-                        <div class="select-wrap">
-                            <select v-model="userForm.gender" class="form-select">
-                                <option v-for="item in genderOptions" :key="item.value" :value="item.value">
-                                    {{ item.label }}
-                                </option>
-                            </select>
-                            <span class="select-arrow">&#9662;</span>
+                    <div class="form-row">
+                        <div class="form-group form-group-half">
+                            <label class="form-label">手机号</label>
+                            <input v-model="userForm.phone" type="text" class="form-input" placeholder="请输入手机号" />
+                        </div>
+                        <div class="form-group form-group-half">
+                            <label class="form-label">邮箱</label>
+                            <input v-model="userForm.email" type="text" class="form-input" placeholder="请输入邮箱" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group form-group-half">
+                            <label class="form-label">毕业院校</label>
+                            <input v-model="userForm.university" type="text" class="form-input" placeholder="请输入毕业院校" />
+                        </div>
+                        <div class="form-group form-group-half">
+                            <label class="form-label">专业</label>
+                            <input v-model="userForm.major" type="text" class="form-input" placeholder="请输入专业" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group form-group-half">
+                            <label class="form-label">学历</label>
+                            <div class="select-wrap">
+                                <select v-model="userForm.degree" class="form-select">
+                                    <option value="">请选择</option>
+                                    <option value="本科">本科</option>
+                                    <option value="硕士">硕士</option>
+                                    <option value="博士">博士</option>
+                                </select>
+                                <span class="select-arrow">&#9662;</span>
+                            </div>
+                        </div>
+                        <div class="form-group form-group-half">
+                            <label class="form-label">毕业年份</label>
+                            <input v-model="userForm.graduation_year" type="number" class="form-input" placeholder="如 2025" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group form-group-half">
+                            <label class="form-label">意向城市</label>
+                            <input v-model="userForm.city_preference" type="text" class="form-input" placeholder="如 北京,上海" />
+                        </div>
+                        <div class="form-group form-group-half">
+                            <label class="form-label">意向岗位</label>
+                            <input v-model="userForm.job_preference" type="text" class="form-input" placeholder="如 技术,产品" />
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="form-label">个人简介</label>
-                        <textarea
-                            v-model="userForm.introduction"
-                            class="form-textarea"
-                            rows="4"
-                            placeholder="请输入个人简介"
-                        ></textarea>
+                        <textarea v-model="userForm.bio" class="form-textarea" rows="4" placeholder="请输入个人简介"></textarea>
                     </div>
                     <div class="form-group">
                         <label class="form-label">头像</label>
@@ -91,29 +140,25 @@ import upload from '@/util/upload.js';
 import Upload from '@/components/upload/Upload.vue';
 
 const userInfo = useUserInfoStore();
-const { username, gender, introduction, role, avatar } = userInfo.$state;
-const userFormRef = ref();
+const { username, role, avatar, real_name, phone, email, major, degree, graduation_year, university, city_preference, job_preference, bio } = userInfo.$state;
 const statusMsg = ref('');
 const userForm = reactive({
-    username,
-    gender,
-    introduction,
-    avatar,
+    username: username || '',
+    real_name: real_name || '',
+    phone: phone || '',
+    email: email || '',
+    avatar: avatar || '',
+    major: major || '',
+    degree: degree || '',
+    graduation_year: graduation_year || '',
+    university: university || '',
+    city_preference: city_preference || '',
+    job_preference: job_preference || '',
+    bio: bio || '',
     file: null
 });
 
 const avatarUrl = computed(() => userInfo.$state.avatar ? userInfo.$state.avatar : 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png');
-
-const genderLabel = computed(() => {
-    const map = { 0: '未知', 1: '男', 2: '女' };
-    return map[gender] || '未知';
-});
-
-const genderOptions = [
-    { label: '未知', value: 0 },
-    { label: '男', value: 1 },
-    { label: '女', value: 2 },
-];
 
 const handChange = (file) => {
     userForm.avatar = URL.createObjectURL(file);
@@ -137,8 +182,16 @@ const submitForm = async () => {
             userInfo.setUserInfo({
                 ...userInfo.$state,
                 username: userForm.username,
-                introduction: userForm.introduction,
-                gender: Number(userForm.gender),
+                real_name: userForm.real_name,
+                phone: userForm.phone,
+                email: userForm.email,
+                major: userForm.major,
+                degree: userForm.degree,
+                graduation_year: userForm.graduation_year ? Number(userForm.graduation_year) : null,
+                university: userForm.university,
+                city_preference: userForm.city_preference,
+                job_preference: userForm.job_preference,
+                bio: userForm.bio,
                 avatar: serverAvatar
             });
             userForm.avatar = serverAvatar;
@@ -151,8 +204,6 @@ const submitForm = async () => {
 </script>
 
 <style lang="scss" scoped>
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap');
-
 /* ── Tokens ── */
 $black: #000000;
 $surface: #0A0A0A;
@@ -282,6 +333,10 @@ $green: #3DDC84;
 .pstat-value {
     font-size: 14px;
     color: $g5;
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* ── Form Card ── */
@@ -312,6 +367,15 @@ $green: #3DDC84;
     margin-bottom: 24px;
 
     &:last-of-type { margin-bottom: 32px; }
+}
+
+.form-row {
+    display: flex;
+    gap: 24px;
+}
+
+.form-group-half {
+    flex: 1;
 }
 
 .form-label {

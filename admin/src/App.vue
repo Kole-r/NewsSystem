@@ -5,9 +5,7 @@
 <style lang="scss">
 #app {
   width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  background-color: #000000;
+  min-height: 100vh;
+  background: var(--black);
 }
 </style>

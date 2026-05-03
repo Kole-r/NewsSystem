@@ -21,7 +21,7 @@
                 </div>
                 <div class="user-info">
                     <span class="user-name">{{ userInfo.$state.username }}</span>
-                    <span class="user-role">{{ userInfo.$state.role === 1 ? 'ADMIN' : 'EDITOR' }}</span>
+                    <span class="user-role">{{ userInfo.$state.role === 1 ? 'ADMIN' : 'GRADUATE' }}</span>
                 </div>
                 <svg class="chevron" :class="{ open: dropdownVisible }" width="14" height="14" viewBox="0 0 14 14" fill="none">
                     <path d="M4 5.5L7 8.5L10 5.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
@@ -117,8 +117,6 @@ const goLogout = () => {
 </script>
 
 <style scoped lang="scss">
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap');
-
 /* ── Tokens ── */
 $black: #000000;
 $surface: #0A0A0A;

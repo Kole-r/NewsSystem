@@ -33,28 +33,83 @@
                         <div class="select-wrap">
                             <select v-model="userForm.role" class="form-select">
                                 <option value="1">管理员</option>
-                                <option value="2">编辑者</option>
+                                <option value="0">毕业生</option>
                             </select>
                             <span class="select-arrow">&#9662;</span>
                         </div>
-                        <span v-if="errors.role" class="form-error">{{ errors.role }}</span>
                     </div>
                     <div class="form-group form-group-half">
-                        <label class="form-label">性别</label>
+                        <label class="form-label">状态</label>
                         <div class="select-wrap">
-                            <select v-model="userForm.gender" class="form-select">
-                                <option v-for="item in genderOptions" :key="item.value" :value="item.value">
-                                    {{ item.label }}
-                                </option>
+                            <select v-model="userForm.status" class="form-select">
+                                <option value="1">正常</option>
+                                <option value="0">禁用</option>
                             </select>
                             <span class="select-arrow">&#9662;</span>
                         </div>
                     </div>
                 </div>
 
+                <div class="form-row">
+                    <div class="form-group form-group-half">
+                        <label class="form-label">真实姓名</label>
+                        <input v-model="userForm.real_name" type="text" class="form-input" placeholder="请输入真实姓名" />
+                    </div>
+                    <div class="form-group form-group-half">
+                        <label class="form-label">手机号</label>
+                        <input v-model="userForm.phone" type="text" class="form-input" placeholder="请输入手机号" />
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group form-group-half">
+                        <label class="form-label">邮箱</label>
+                        <input v-model="userForm.email" type="text" class="form-input" placeholder="请输入邮箱" />
+                    </div>
+                    <div class="form-group form-group-half">
+                        <label class="form-label">毕业院校</label>
+                        <input v-model="userForm.university" type="text" class="form-input" placeholder="请输入毕业院校" />
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group form-group-half">
+                        <label class="form-label">专业</label>
+                        <input v-model="userForm.major" type="text" class="form-input" placeholder="请输入专业" />
+                    </div>
+                    <div class="form-group form-group-half">
+                        <label class="form-label">学历</label>
+                        <div class="select-wrap">
+                            <select v-model="userForm.degree" class="form-select">
+                                <option value="">请选择</option>
+                                <option value="本科">本科</option>
+                                <option value="硕士">硕士</option>
+                                <option value="博士">博士</option>
+                            </select>
+                            <span class="select-arrow">&#9662;</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group form-group-half">
+                        <label class="form-label">毕业年份</label>
+                        <input v-model="userForm.graduation_year" type="number" class="form-input" placeholder="如 2025" />
+                    </div>
+                    <div class="form-group form-group-half">
+                        <label class="form-label">意向城市</label>
+                        <input v-model="userForm.city_preference" type="text" class="form-input" placeholder="如 北京,上海,深圳" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">意向岗位</label>
+                    <input v-model="userForm.job_preference" type="text" class="form-input" placeholder="如 技术,产品,运营" />
+                </div>
+
                 <div class="form-group">
                     <label class="form-label">个人简介</label>
-                    <textarea v-model="userForm.introduction" class="form-textarea" rows="4" placeholder="请输入个人简介"></textarea>
+                    <textarea v-model="userForm.bio" class="form-textarea" rows="4" placeholder="请输入个人简介"></textarea>
                 </div>
 
                 <div class="form-group">
@@ -83,25 +138,27 @@ const statusMsg = ref('');
 const userForm = reactive({
     username: '',
     password: '',
-    role: '2',
-    gender: 0,
-    introduction: '',
+    role: '0',
+    status: '1',
+    real_name: '',
+    phone: '',
+    email: '',
     avatar: '',
+    major: '',
+    degree: '',
+    graduation_year: '',
+    university: '',
+    city_preference: '',
+    job_preference: '',
+    bio: '',
     file: null
 });
 
 const errors = reactive({
     username: '',
     password: '',
-    role: '',
     avatar: ''
 });
-
-const genderOptions = [
-    { label: '未知', value: 0 },
-    { label: '男', value: 1 },
-    { label: '女', value: 2 },
-];
 
 const handChange = (file) => {
     userForm.avatar = URL.createObjectURL(file);
@@ -112,7 +169,6 @@ const handChange = (file) => {
 const clearErrors = () => {
     errors.username = '';
     errors.password = '';
-    errors.role = '';
     errors.avatar = '';
 };
 
@@ -134,10 +190,6 @@ const validate = () => {
     }
     if (userForm.password.length > 20) {
         errors.password = '密码长度不能超过 20 个字符';
-        valid = false;
-    }
-    if (!userForm.role) {
-        errors.role = '请选择角色';
         valid = false;
     }
     if (!userForm.avatar) {
@@ -172,8 +224,6 @@ const submitForm = async () => {
 </script>
 
 <style lang="scss" scoped>
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap');
-
 /* ── Tokens ── */
 $black: #000000;
 $surface: #0A0A0A;
@@ -229,6 +279,7 @@ $green: #3DDC84;
     border-radius: 12px;
     overflow: hidden;
     max-width: 720px;
+    margin: 0 auto;
 }
 
 .form-header {

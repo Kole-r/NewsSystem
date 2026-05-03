@@ -5,16 +5,31 @@ const NewsController = {
   // 获取新闻列表或单个新闻
   getNews: async (req, res) => {
     try {
-      const newsId = req.params.id; // 获取路径参数中的 id
+      const newsId = req.params.id;
       const result = await NewsService.getNews(newsId);
 
-      // 处理返回结果：如果是单个新闻，转换为数组；如果是列表，直接使用
       const newsList = Array.isArray(result) ? result : (result ? [result] : []);
+
+      // 映射字段：数据库字段 → 前端期望字段
+      const mappedList = newsList.map(item => ({
+        id: item.id,
+        title: item.title,
+        content: item.content,
+        summary: item.summary,
+        category: item.category,
+        cover: item.cover,
+        tags: item.tags,
+        views: item.views,
+        isPublish: item.status,
+        editTime: item.updated_at,
+        userId: item.publisher_id,
+        created_at: item.created_at,
+      }));
 
       res.status(200).json({
         code: 200,
         message: '新闻列表获取成功',
-        data: newsList
+        data: mappedList
       });
     } catch (error) {
       console.error('获取新闻列表失败:', error);
@@ -54,78 +69,56 @@ const NewsController = {
 
   // 添加新闻
   addNews: async (req, res) => {
-    try {      
-      const { title, content, category, isPublish } = req.body;
-      console.log('【NewsController】解构出的数据:', { title, content, category, isPublish });
-      
-      const cover = req.file ? `/newsuploads/${req.file.filename}` : null; // 封面图片路径，如果没有上传则为 null
-      console.log('【NewsController】处理后的封面路径:', cover);
-      
+    try {
+      const { title, content, summary, category, tags, isPublish } = req.body;
+      const cover = req.file ? `/newsuploads/${req.file.filename}` : null;
+
       // 获取当前用户 ID
       const token = req.headers['authorization']?.split(' ')[1];
-      console.log('【NewsController】获取到的Token:', token ? '存在' : '不存在');
       const payload = JWT.verify(token);
-      console.log('【NewsController】Token解析结果:', payload);
-      const userId = payload.id;
-      console.log('【NewsController】当前用户ID:', userId);
+      const publisher_id = payload.id;
 
       // 参数验证
-      console.log('【NewsController】开始参数验证...');
       if (!title || title.length < 5 || title.length > 100) {
-        console.log('❌ 【NewsController】标题验证失败:', { title, length: title?.length });
         return res.status(400).json({
           code: 400,
           message: '新闻标题长度必须在 5 - 100 之间'
         });
       }
-      console.log('✓ 【NewsController】标题验证通过');
-
       if (!content || content.length < 20) {
-        console.log('❌ 【NewsController】内容验证失败:', { content: content?.substring(0, 50), length: content?.length });
         return res.status(400).json({
           code: 400,
           message: '新闻内容长度必须至少 20 字'
         });
       }
-      console.log('✓ 【NewsController】内容验证通过，长度:', content.length);
-
       if (!category) {
-        console.log('❌ 【NewsController】分类验证失败');
         return res.status(400).json({
           code: 400,
           message: '请选择新闻分类'
         });
       }
-      console.log('✓ 【NewsController】分类验证通过:', category);
 
       // 调用 Service 层添加新闻
-      console.log('【NewsController】所有验证通过，准备调用Service层添加新闻...');
       const newsData = {
         title,
         content,
+        summary: summary || null,
         category: Number(category),
         cover,
-        isPublish: Number(isPublish) || 0,
-        userId
+        tags: tags || null,
+        status: Number(isPublish) || 0,
+        publisher_id
       };
-      console.log('【NewsController】传递给Service的完整数据:', JSON.stringify(newsData, null, 2));
-      
+
       const newsId = await NewsService.addNews(newsData);
-      
-      console.log('【NewsController】✓ 新闻添加成功，ID:', newsId);
-      console.log('============================================\n');
 
       res.status(200).json({
         code: 200,
         message: '新闻添加成功',
-        data: {
-          id: newsId
-        }
+        data: { id: newsId }
       });
     } catch (error) {
-      console.error('\n❌ 【NewsController】添加新闻失败:', error.message);
-      console.error('【NewsController】错误堆栈:', error.stack);
-      console.log('============================================\n');
+      console.error('添加新闻失败:', error);
       res.status(500).json({
         code: 500,
         message: '服务器内部错误'
@@ -136,9 +129,8 @@ const NewsController = {
   // 更新新闻
   updateNews: async (req, res) => {
     try {
-      console.log('=== updateNews 开始 ===');
       const newsId = req.params.id;
-      const { title, content, category, isPublish } = req.body;
+      const { title, content, summary, category, tags, isPublish } = req.body;
       const cover = req.file ? `/newsuploads/${req.file.filename}` : null;
 
       // 参数验证
@@ -167,8 +159,10 @@ const NewsController = {
       const updateData = {};
       if (title) updateData.title = title;
       if (content) updateData.content = content;
+      if (summary !== undefined) updateData.summary = summary;
       if (category) updateData.category = Number(category);
-      if (isPublish !== undefined) updateData.isPublish = Number(isPublish);
+      if (tags !== undefined) updateData.tags = tags;
+      if (isPublish !== undefined) updateData.status = Number(isPublish);
       if (cover) updateData.cover = cover;
 
       // 调用 Service 层更新新闻

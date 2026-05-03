@@ -2,10 +2,10 @@ import Home from '../views/home/Home.vue';
 import Center from '../views/center/Center.vue';
 import UserList from '../views/user-management/UserList.vue'
 import UserAdd from '../views/user-management/UserAdd.vue'
-import ProductList from '../views/product-management/ProductList.vue'
-import ProductAdd from '../views/product-management/ProductAdd.vue'
 import NewsList from '../views/news-management/NewsList.vue'
 import NewsAdd from '../views/news-management/NewsAdd.vue'
+import JobList from '../views/job-management/JobList.vue'
+import JobAdd from '../views/job-management/JobAdd.vue'
 
 const routes = [
     {
@@ -27,20 +27,20 @@ const routes = [
         requiresAdmin: true,
     },
     {
-        path: '/product-management/ProductList',
-        component: ProductList,
-    },
-    {
-        path: '/product-management/ProductAdd',
-        component: ProductAdd,
-    },
-    {
         path: '/news-management/NewsList',
         component: NewsList,
     },
     {
         path: '/news-management/NewsAdd',
         component: NewsAdd,
+    },
+    {
+        path: '/job-management/JobList',
+        component: JobList,
+    },
+    {
+        path: '/job-management/JobAdd',
+        component: JobAdd,
     },
     {
         path: '/',

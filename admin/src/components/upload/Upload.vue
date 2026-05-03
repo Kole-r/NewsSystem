@@ -1,52 +1,94 @@
 <template>
-    <el-upload class="avatar-uploader" action="" :show-file-list="false" :auto-upload="false" :on-change="handChange">
-        <img v-if="props.avatar" :src="uploadAvatar" class="avatar" />
-        <el-icon v-else class="avatar-uploader-icon">
-            <Plus />
-        </el-icon>
-    </el-upload>
+    <div class="upload-zone" @click="triggerUpload">
+        <img v-if="props.avatar" :src="uploadAvatar" class="upload-preview" />
+        <div v-else class="upload-placeholder">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            <span class="upload-label">UPLOAD</span>
+        </div>
+        <el-upload
+            ref="uploadRef"
+            class="upload-hidden"
+            action=""
+            :show-file-list="false"
+            :auto-upload="false"
+            :on-change="handChange"
+        >
+            <span></span>
+        </el-upload>
+    </div>
 </template>
+
 <script setup>
-import { defineEmits,defineProps ,computed} from 'vue';
-import { Plus } from '@element-plus/icons-vue';
+import { defineEmits, defineProps, computed, ref } from 'vue';
 
 const props = defineProps({
-    avatar:String
-})
-// 定义事件koleChange可以被父组件监听
-const emit = defineEmits(["koleChange"])
-// 计算属性动态生成上传后的头像 URL
+    avatar: String
+});
+
+const emit = defineEmits(["koleChange"]);
+const uploadRef = ref(null);
 const uploadAvatar = computed(() => props.avatar);
-// 处理文件变化事件 
+
+const triggerUpload = () => {
+    uploadRef.value?.$el?.querySelector('input')?.click();
+};
+
 const handChange = (file) => {
-    emit("koleChange",file.raw)
+    emit("koleChange", file.raw);
 };
 </script>
+
 <style scoped lang="scss">
-:deep(.el-upload) {
-    border: 1px dashed var(--el-border-color);
-    border-radius: 6px;
+.upload-zone {
+    width: 120px;
+    height: 120px;
+    border: 1px dashed #333333;
+    border-radius: 8px;
     cursor: pointer;
-    position: relative;
     overflow: hidden;
-    transition: var(--el-transition-duration-fast);
+    transition: border-color 200ms ease-out;
+    position: relative;
+
+    &:hover {
+        border-color: #666666;
+    }
 }
 
-:deep(.el-upload:hover) {
-    border-color: var(--el-color-primary);
-}
-
-:deep(.el-icon.avatar-uploader-icon) {
-    font-size: 28px;
-    color: #8c939d;
-    width: 178px;
-    height: 178px;
-    text-align: center;
-}
-
-:deep(.avatar) {
-    width: 178px;
-    height: 178px;
+.upload-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     display: block;
+}
+
+.upload-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: #666666;
+    transition: color 200ms ease-out;
+
+    .upload-zone:hover & {
+        color: #999999;
+    }
+}
+
+.upload-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+}
+
+.upload-hidden {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
 }
 </style>

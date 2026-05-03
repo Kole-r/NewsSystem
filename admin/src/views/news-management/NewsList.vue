@@ -134,31 +134,43 @@
                 <div v-if="editVisible" class="modal-backdrop" @click.self="editVisible = false">
                     <div class="edit-modal">
                         <div class="modal-top">
-                            <span class="modal-tag">EDIT</span>
+                            <span class="modal-tag">EDIT ARTICLE</span>
                             <button class="modal-close" @click="editVisible = false">&times;</button>
                         </div>
                         <div class="edit-scroll">
-                            <el-form ref="editFormRef" :model="editForm" :rules="editFormRules" label-width="auto">
-                                <el-form-item label="新闻标题" prop="title">
-                                    <el-input v-model="editForm.title" placeholder="请输入新闻标题" />
-                                </el-form-item>
-                                <el-form-item label="新闻内容" prop="content">
-                                    <el-input v-model="editForm.content" type="textarea" :rows="10" placeholder="请输入新闻内容" />
-                                </el-form-item>
-                                <el-form-item label="类别" prop="category">
-                                    <el-select v-model="editForm.category" placeholder="请选择类别">
-                                        <el-option label="国内" :value="1" />
-                                        <el-option label="国际" :value="2" />
-                                        <el-option label="体育" :value="3" />
-                                        <el-option label="娱乐" :value="4" />
-                                    </el-select>
-                                </el-form-item>
-                                <el-form-item label="封面">
+                            <div class="form-group">
+                                <label class="form-label">新闻标题</label>
+                                <input v-model="editForm.title" type="text" class="form-input" placeholder="请输入新闻标题（5-100字）" />
+                                <span v-if="editErrors.title" class="form-error">{{ editErrors.title }}</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">新闻内容</label>
+                                <textarea v-model="editForm.content" class="form-textarea" rows="10" placeholder="请输入新闻内容"></textarea>
+                                <span v-if="editErrors.content" class="form-error">{{ editErrors.content }}</span>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group form-group-half">
+                                    <label class="form-label">类别</label>
+                                    <div class="select-wrap">
+                                        <select v-model="editForm.category" class="form-select">
+                                            <option :value="null" disabled>请选择类别</option>
+                                            <option :value="1">政策解读</option>
+                                            <option :value="2">行业动态</option>
+                                            <option :value="3">求职技巧</option>
+                                            <option :value="4">校园招聘</option>
+                                        </select>
+                                        <span class="select-arrow">&#9662;</span>
+                                    </div>
+                                    <span v-if="editErrors.category" class="form-error">{{ editErrors.category }}</span>
+                                </div>
+                                <div class="form-group form-group-half">
+                                    <label class="form-label">封面</label>
                                     <Upload :avatar="editForm.cover" @koleChange="handleEditCoverChange" />
-                                </el-form-item>
-                            </el-form>
+                                </div>
+                            </div>
                         </div>
                         <div class="modal-foot">
+                            <span v-if="editStatusMsg" class="edit-status">{{ editStatusMsg }}</span>
                             <button class="abtn abtn-cancel" @click="editVisible = false">取消</button>
                             <button class="abtn abtn-save" @click="submitEdit">保存</button>
                         </div>
@@ -170,8 +182,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, reactive } from 'vue';
 import axios from '@/util/axios.config.js';
+import upload from '@/util/upload.js';
 import Upload from '@/components/upload/Upload.vue';
 
 const tableData = ref([]);
@@ -180,30 +193,20 @@ const statusMsg = ref('');
 const previewVisible = ref(false);
 const previewData = ref({});
 const editVisible = ref(false);
-const editFormRef = ref(null);
+const editStatusMsg = ref('');
 
 const editForm = ref({
     id: null, title: '', content: '', category: null, cover: '', file: null, isPublish: 0
 });
 
-const editFormRules = {
-    title: [
-        { required: true, message: '请输入新闻标题', trigger: 'blur' },
-        { min: 5, max: 100, message: '长度必须在 5 - 100 之间', trigger: 'blur' }
-    ],
-    content: [
-        { required: true, message: '请输入新闻内容', trigger: 'blur' },
-        { min: 20, message: '内容长度必须至少 20 字', trigger: 'blur' }
-    ],
-    category: [{ required: true, message: '请选择新闻分类', trigger: 'change' }]
-};
+const editErrors = reactive({ title: '', content: '', category: '' });
 
 const categoryOptions = [
     { label: '全部', value: 0 },
-    { label: '国内', value: 1 },
-    { label: '国际', value: 2 },
-    { label: '体育', value: 3 },
-    { label: '娱乐', value: 4 }
+    { label: '政策解读', value: 1 },
+    { label: '行业动态', value: 2 },
+    { label: '求职技巧', value: 3 },
+    { label: '校园招聘', value: 4 }
 ];
 
 const filteredData = computed(() => {
@@ -261,26 +264,49 @@ const handleEditCoverChange = (file) => {
     editForm.value.file = file;
 };
 
-const submitEdit = () => {
-    editFormRef.value.validate(async (valid) => {
-        if (!valid) return;
-        try {
-            const fd = new FormData();
-            fd.append('title', editForm.value.title);
-            fd.append('content', editForm.value.content);
-            fd.append('category', editForm.value.category);
-            fd.append('isPublish', editForm.value.isPublish);
-            if (editForm.value.file) fd.append('file', editForm.value.file);
-            await axios.put(`/adminApi/news/update/${editForm.value.id}`, fd, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            });
-            editVisible.value = false;
-            showStatus('[SAVED]');
-            getTableData();
-        } catch (e) {
-            showStatus('[ERROR] 保存失败');
-        }
-    });
+const validateEdit = () => {
+    editErrors.title = '';
+    editErrors.content = '';
+    editErrors.category = '';
+    let valid = true;
+    if (!editForm.value.title || editForm.value.title.length < 5) {
+        editErrors.title = '标题长度至少 5 个字符';
+        valid = false;
+    }
+    if (editForm.value.title.length > 100) {
+        editErrors.title = '标题长度不能超过 100 个字符';
+        valid = false;
+    }
+    if (!editForm.value.content || editForm.value.content.length < 20) {
+        editErrors.content = '内容长度至少 20 个字符';
+        valid = false;
+    }
+    if (!editForm.value.category) {
+        editErrors.category = '请选择新闻分类';
+        valid = false;
+    }
+    return valid;
+};
+
+const submitEdit = async () => {
+    if (!validateEdit()) return;
+    try {
+        const fd = new FormData();
+        fd.append('title', editForm.value.title);
+        fd.append('content', editForm.value.content);
+        fd.append('category', editForm.value.category);
+        fd.append('isPublish', editForm.value.isPublish);
+        if (editForm.value.file) fd.append('file', editForm.value.file);
+        await axios.put(`/adminApi/news/update/${editForm.value.id}`, fd, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        editVisible.value = false;
+        showStatus('[SAVED]');
+        getTableData();
+    } catch (e) {
+        editStatusMsg.value = '[ERROR] 保存失败';
+        setTimeout(() => { editStatusMsg.value = ''; }, 3000);
+    }
 };
 
 const handleDelete = async (row) => {
@@ -295,8 +321,6 @@ const handleDelete = async (row) => {
 </script>
 
 <style lang="scss" scoped>
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap');
-
 /* ── Tokens ── */
 $black: #000000;
 $surface: #0A0A0A;
@@ -764,28 +788,114 @@ $blue: #5B9BF6;
 /* ── Edit Modal ── */
 .edit-modal {
     width: 720px;
+}
 
-    :deep(.el-form-item__label) {
-        font-family: 'Space Mono', monospace;
-        font-size: 11px;
-        letter-spacing: 0.08em;
-        color: $g3;
-    }
+.form-group {
+    margin-bottom: 20px;
+}
 
-    :deep(.el-input__wrapper),
-    :deep(.el-textarea__inner) {
-        background: $surface-2;
-        border: 1px solid $border-hi;
-        border-radius: 8px;
-        box-shadow: none;
-        color: $white;
-        font-family: 'Space Grotesk', sans-serif;
+.form-row {
+    display: flex;
+    gap: 16px;
+}
 
-        &:hover { border-color: $g2; }
-        &.is-focus { border-color: $g5; }
-    }
+.form-group-half {
+    flex: 1;
+}
 
-    :deep(.el-select .el-input__wrapper) { box-shadow: none; }
+.form-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: $g3;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.form-input {
+    width: 100%;
+    background: $surface-2;
+    border: 1px solid $border-hi;
+    border-radius: 8px;
+    padding: 11px 14px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    color: $white;
+    outline: none;
+    transition: border-color 150ms ease-out;
+    box-sizing: border-box;
+
+    &::placeholder { color: $g1; }
+    &:focus { border-color: $g4; }
+}
+
+.form-error {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: $accent;
+    display: block;
+    margin-top: 6px;
+    letter-spacing: 0.02em;
+}
+
+.select-wrap {
+    position: relative;
+}
+
+.form-select {
+    width: 100%;
+    background: $surface-2;
+    border: 1px solid $border-hi;
+    border-radius: 8px;
+    padding: 11px 14px;
+    padding-right: 40px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    color: $white;
+    outline: none;
+    appearance: none;
+    cursor: pointer;
+    transition: border-color 150ms ease-out;
+    box-sizing: border-box;
+
+    &:focus { border-color: $g4; }
+}
+
+.select-arrow {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: $g3;
+    pointer-events: none;
+}
+
+.form-textarea {
+    width: 100%;
+    background: $surface-2;
+    border: 1px solid $border-hi;
+    border-radius: 8px;
+    padding: 11px 14px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    color: $white;
+    outline: none;
+    resize: vertical;
+    transition: border-color 150ms ease-out;
+    box-sizing: border-box;
+
+    &::placeholder { color: $g1; }
+    &:focus { border-color: $g4; }
+}
+
+.edit-status {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: $g4;
+    margin-right: auto;
 }
 
 /* ── Transitions ── */

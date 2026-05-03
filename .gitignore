@@ -23,5 +23,16 @@ dist-ssr
 *.sln
 *.sw?
 
-# Ignore avataruploads folder
+# Uploads
 /server/public/avataruploads/
+
+# AI fine-tuning (too large for git)
+ai_tuning/
+
+# Python
+ai_service/venv/
+__pycache__/
+*.pyc
+
+# ChromaDB
+ai_service/chroma_db/

@@ -22,10 +22,10 @@ const findByCategory = async (category) => {
 
 // 创建新闻
 const create = async (newsData) => {
-  const { title, content, category, cover, isPublish, userId } = newsData;
+  const { title, content, summary, category, cover, tags, status, publisher_id } = newsData;
   const [result] = await db.query(
-    'INSERT INTO news (title, content, category, cover, isPublish, userId, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())',
-    [title, content, category, cover, isPublish, userId]
+    'INSERT INTO news (title, content, summary, category, cover, tags, status, publisher_id, publish_date, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURDATE(), NOW(), NOW())',
+    [title, content, summary, category, cover, tags, status, publisher_id]
   );
   return result.insertId;
 };

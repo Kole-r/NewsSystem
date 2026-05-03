@@ -52,6 +52,7 @@
                         SIGN IN
                     </el-button>
                 </el-form-item>
+                <div v-if="statusMsg" class="login-status">{{ statusMsg }}</div>
             </el-form>
 
             <!-- Tertiary: footer -->
@@ -68,7 +69,6 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from '../util/axios.config.js'
-import { ElMessage } from 'element-plus'
 import useUserInfoStore from '../store/userInfo.js'
 
 const LoginForm = reactive({
@@ -76,6 +76,7 @@ const LoginForm = reactive({
     password: ''
 })
 const LoginFormRef = ref()
+const statusMsg = ref('')
 
 const Loginrules = reactive({
     username: [
@@ -94,24 +95,23 @@ const userInfoStore = useUserInfoStore()
 const submitForm = () => {
     LoginFormRef.value.validate((valid) => {
         if (valid) {
+            statusMsg.value = ''
             axios.post("/adminApi/user/login", LoginForm).then(res => {
                 if (res.data.code === 200) {
                     userInfoStore.setUserInfo(res.data.data)
                     router.push('/')
                 } else {
-                    ElMessage.error('Username or password is incorrect!!!')
+                    statusMsg.value = '[ERROR] 用户名或密码不正确'
+                    setTimeout(() => { statusMsg.value = '' }, 3000)
                 }
             }).catch(error => {
-                console.error('登录请求失败:', error)
+                statusMsg.value = '[ERROR] 登录请求失败'
+                setTimeout(() => { statusMsg.value = '' }, 3000)
             })
         }
     })
 }
 </script>
-
-<style lang="scss">
-@import url('https://fonts.googleapis.com/css2?family=Doto:wght@400;700&family=Space+Grotesk:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap');
-</style>
 
 <style scoped lang="scss">
 
@@ -294,5 +294,14 @@ const submitForm = () => {
     font-size: 11px;
     color: #D71921;
     letter-spacing: 0.04em;
+}
+
+.login-status {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: #D71921;
+    text-align: center;
+    margin-top: 4px;
 }
 </style>

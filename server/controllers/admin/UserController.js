@@ -33,11 +33,21 @@ const UserController = {
                 code: 200,
                 message: '登录成功',
                 data: {
+                    id: userInfo.id,
                     username: userInfo.username,
                     role: userInfo.role,
-                    gender: userInfo.gender ? userInfo.gender : null,
-                    introduction: userInfo.introduction ? userInfo.introduction : null,
-                    avatar: userInfo.avatar ? userInfo.avatar : null
+                    real_name: userInfo.real_name || null,
+                    phone: userInfo.phone || null,
+                    email: userInfo.email || null,
+                    avatar: userInfo.avatar || null,
+                    major: userInfo.major || null,
+                    degree: userInfo.degree || null,
+                    graduation_year: userInfo.graduation_year || null,
+                    university: userInfo.university || null,
+                    city_preference: userInfo.city_preference || null,
+                    job_preference: userInfo.job_preference || null,
+                    bio: userInfo.bio || null,
+                    status: userInfo.status
                 }
             });
         } catch (error) {
@@ -48,26 +58,34 @@ const UserController = {
         }
     },
     upload: async (req, res) => {
-        const { username, introduction, gender } = req.body;
+        const { username, bio, real_name, phone, email, major, degree, graduation_year, university, city_preference, job_preference } = req.body;
         const avatar = req.file ? `/avataruploads/${req.file.filename}` : null;
         //调用server模块更新数据
         const token = req.headers['authorization']?.split(' ')[1];
         const payload = JWT.verify(token);
         //更新用户信息
         try {
-            const updateData = { username, introduction, gender: Number(gender) };
+            const updateData = { username, bio, real_name, phone, email, major, degree, graduation_year: graduation_year ? Number(graduation_year) : null, university, city_preference, job_preference };
             if (avatar) {
-                updateData.avatar = avatar; // 只有当 avatar 不为空时才添加到更新数据中
+                updateData.avatar = avatar;
             }
             await UserService.update(payload.id, updateData);
             res.status(200).json({
                 code: 200,
-                message: '头像上传成功',
+                message: '用户信息更新成功',
                 data: {
-                    username: username,
-                    introduction: introduction,
-                    gender: Number(gender),
-                    avatar: avatar
+                    username,
+                    bio,
+                    real_name,
+                    phone,
+                    email,
+                    major,
+                    degree,
+                    graduation_year: graduation_year ? Number(graduation_year) : null,
+                    university,
+                    city_preference,
+                    job_preference,
+                    avatar: avatar || req.body.avatar
                 }
             });
         } catch (error) {
@@ -80,7 +98,7 @@ const UserController = {
     // 添加用户
     addUser: async (req, res) => {
         try {
-            const { username, password, role, gender, introduction } = req.body;
+            const { username, password, role, real_name, phone, email, major, degree, graduation_year, university, city_preference, job_preference, bio, status } = req.body;
             const avatar = req.file ? `/avataruploads/${req.file.filename}` : null;
 
             // 参数验证
@@ -96,21 +114,24 @@ const UserController = {
                     message: '密码长度必须在6到20个字符之间'
                 });
             }
-            if (!role) {
-                return res.status(400).json({
-                    code: 400,
-                    message: '角色不能为空'
-                });
-            }
 
             // 调用Service层添加用户
             await UserService.addUser({
                 username,
                 password,
-                role: Number(role),
-                gender: Number(gender),
-                introduction,
-                avatar
+                role: role !== undefined ? Number(role) : 0,
+                real_name,
+                phone,
+                email,
+                avatar,
+                major,
+                degree,
+                graduation_year: graduation_year ? Number(graduation_year) : null,
+                university,
+                city_preference,
+                job_preference,
+                bio,
+                status: status !== undefined ? Number(status) : 1
             });
             res.status(200).json({
                 code: 200,
@@ -140,15 +161,25 @@ const UserController = {
                     username: user.username,
                     role: user.role,
                     avatar: user.avatar,
-                    introduction: user.introduction,
+                    real_name: user.real_name,
+                    phone: user.phone,
+                    email: user.email,
+                    major: user.major,
+                    degree: user.degree,
+                    graduation_year: user.graduation_year,
+                    university: user.university,
+                    city_preference: user.city_preference,
+                    job_preference: user.job_preference,
+                    bio: user.bio,
+                    status: user.status,
                 }))
             });
         } catch (error) {
-            console.error('获取用户列表失败:', error); // 添加错误日志
+            console.error('获取用户列表失败:', error);
             res.status(500).json({
                 code: 500,
                 message: '服务器内部错误',
-                error: error.message // 开发环境可以返回错误详情
+                error: error.message
             });
         }
     },
@@ -177,15 +208,10 @@ const UserController = {
     //编辑用户
     editUser: async (req, res) => {
         try {
-            console.log('=== editUser 开始 ===');
-            console.log('req.params:', req.params);
-            console.log('req.body:', req.body);
-            console.log('req.file:', req.file);
-            
             const userId = req.params.id;
-            const { username, password, role, gender, introduction } = req.body;
-            const avatar = req.file ? `/avataruploads/${req.file.filename}` : undefined;
-            
+            const { username, password, role, real_name, phone, email, major, degree, graduation_year, university, city_preference, job_preference, bio, status } = req.body;
+            const avatar = req.file ? `/avataruploads/${req.file.filename}` : (req.body.avatar || undefined);
+
             // 参数验证
             if (!username || username.length < 3 || username.length > 20) {
                 return res.status(400).json({
@@ -205,18 +231,25 @@ const UserController = {
                     message: '用户ID不能为空'
                 });
             }
-            
-            // 构建更新数据（只更新提供的字段，使用 in 检查字段是否存在）
+
+            // 构建更新数据（只更新提供的字段）
             const updateData = {};
             if ('username' in req.body && username) updateData.username = username;
-            if ('password' in req.body && password) updateData.password = password; // 密码可选，空则不更新
+            if ('password' in req.body && password) updateData.password = password;
             if ('role' in req.body && role !== undefined) updateData.role = Number(role);
-            if ('gender' in req.body && gender !== undefined) updateData.gender = Number(gender);
-            if ('introduction' in req.body) updateData.introduction = introduction || ''; // 允许清空
-            if (avatar) updateData.avatar = avatar; // 只有上传新头像才更新
-            
-            console.log('updateData:', updateData);
-            
+            if ('real_name' in req.body) updateData.real_name = real_name || null;
+            if ('phone' in req.body) updateData.phone = phone || null;
+            if ('email' in req.body) updateData.email = email || null;
+            if ('major' in req.body) updateData.major = major || null;
+            if ('degree' in req.body) updateData.degree = degree || null;
+            if ('graduation_year' in req.body) updateData.graduation_year = graduation_year ? Number(graduation_year) : null;
+            if ('university' in req.body) updateData.university = university || null;
+            if ('city_preference' in req.body) updateData.city_preference = city_preference || null;
+            if ('job_preference' in req.body) updateData.job_preference = job_preference || null;
+            if ('bio' in req.body) updateData.bio = bio || null;
+            if ('status' in req.body && status !== undefined) updateData.status = Number(status);
+            if (avatar !== undefined) updateData.avatar = avatar;
+
             // 调用Service层更新用户
             await UserService.update(userId, updateData);
 
@@ -225,7 +258,7 @@ const UserController = {
                 message: '用户更新成功'
             });
         } catch (error) {
-            console.error('编辑用户失败:');
+            console.error('编辑用户失败:', error);
             res.status(500).json({
                 code: 500,
                 message: '服务器内部错误',

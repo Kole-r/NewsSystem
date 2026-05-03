@@ -265,9 +265,6 @@ const sendMessage = async () => {
 </script>
 
 <style scoped>
-/* ========== Fonts ========== */
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=Space+Mono:wght@400;700&family=Doto:wght@400;700&display=swap');
-
 /* ========== Nothing Tokens ========== */
 .chatbot-container {
   --nd-black: #000000;
